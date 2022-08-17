@@ -1,0 +1,13 @@
+
+{
+    "assets": [
+        { "meatball_mountains": "assets/meatball_mountain.glb" },
+        { "meatball_3d": "assets/meatbaddie.glb" },
+        { "automac1000_arm": "assets/automac1000_arm.glb" },
+        { "room": "assets/room.glb" },
+        { "bullet_3d": "assets/macaroni.glb" },
+        { "penne_3d": "assets/penne_3d.glb" },
+        { "sv": "assets/sv.fbx" },
+        { "glove_yellow": "assets/glove_yellow.png" }
+    ]
+}

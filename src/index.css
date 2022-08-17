@@ -1,0 +1,40 @@
+
+@font-face {
+	font-family: "Bangers";
+	src: url("assets/fonts/bangers-regular-webfont.woff") format("woff");
+}
+@font-face {
+	font-family:  "Digitizer";
+	src: url("assets/fonts/digitizer.woff") format("woff");
+}
+/**********************************************  MEDIA QUERIES */
+
+@media screen and (orientation: portrait)
+{
+	canvas{
+		border: none;
+	}
+	body{
+		background-image: none;
+		background-color: black;
+	}
+}
+@media screen and (orientation: landscape)
+{
+	canvas{
+		box-sizing: border-box; 
+	}
+	body{
+		background-image: url("assets/static/spaghetti.svg");
+	}
+
+}
+@media screen and (min-width: 1030px) /* desktop only */
+{
+	
+	#game > canvas{
+		
+		box-shadow: 0 0 25px #000000;
+		border: 0.5em solid #313131;
+	}
+}

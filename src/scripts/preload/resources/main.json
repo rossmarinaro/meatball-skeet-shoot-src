@@ -1,0 +1,12 @@
+
+
+{  
+    
+    "audio": [
+        { "phryg1": "assets/audio/music/phrygian1.ogg" },
+        { "airhorn": "assets/audio/sounds/airhorn.ogg" },
+        { "automac1000_shot": "assets/audio/sounds/automac1000.ogg" },
+        { "fire_fx": "assets/audio/sounds/fire.ogg" }
+    ]
+}
+
