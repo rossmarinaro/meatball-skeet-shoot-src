@@ -100,7 +100,8 @@ export class Rifle extends ExtendedObject3D {
         bullet.position.copy(firstPersonCamPos);
         bullet.rotation.copy(this.scene['controller'].firstPersonControls.target.rotation);
         bullet.body.applyForce(x, y, z);
-        //System.config.events.socket.emit('DEATHMATCH: player attack', { source: this.source, damage: 3});
+
+      //destroy meatball targets
 
         bullet.body.on.collision(async (otherObject, event) => {
 
@@ -110,6 +111,7 @@ export class Rifle extends ExtendedObject3D {
         });
 
       //shell casing
+
         this.scene.time.delayedCall(500, ()=> {
           const shellCasing = new ExtendedObject3D();
           shellCasing.name = 'bullet_3d';
@@ -141,6 +143,7 @@ export class Rifle extends ExtendedObject3D {
         if (otherObject.hasBody) 
         {
           this.scene.third.destroy(otherObject);
+          this.scene['meatballs'].splice(otherObject, 1);
           System.config.audio.play('fire_fx', 6, false, this.scene, 0);
         }
       }

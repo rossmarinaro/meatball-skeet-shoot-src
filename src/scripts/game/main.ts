@@ -29,6 +29,7 @@ export class TargetPractice extends Scene3D {
   public entities: Player[]
   public meatballs: Meatball[] = []
 
+  private gameState: boolean
   private swankyVelvet: ExtendedObject3D
   private swankymations: string[]
 
@@ -39,9 +40,10 @@ export class TargetPractice extends Scene3D {
   public init([scene, rounds])
   {
 
+   this.gameState = true;
    this._scene = scene;
    this.rounds = rounds;
-   this.timeLeft = 1000.000;
+   this.timeLeft = 60.000;
    this.score = 0;
 
    System.config.audio.music.play(this._scene);
@@ -51,10 +53,16 @@ export class TargetPractice extends Scene3D {
     //this.third.physics.debug?.enable();    
 
   }
+
+  //----------------------------------------------------
+
   public async preload()
   { 
     await this._scene.scene.get('Preload')['preload3D'](this._scene, this);
   }
+
+  //---------------------------------------------------
+
   public async create()
   {
 
@@ -73,31 +81,12 @@ export class TargetPractice extends Scene3D {
     //entities
       this.entities = [this.player];
 
-      //------------------spawn meatball targets
+      //spawn meatball targets
 
-         await Meatball.spawn(this, this.meatballs);
+        await Meatball.spawn(this, this.meatballs);
 
-        //tweens
-         this.meatballs.forEach(i => {
-           let tmp = i.position.clone();
-            this.tweens.add({
-              targets: tmp, 
-              duration: 5000, 
-              stagger: this.tweens.stagger(100, {}),
-              repeatDelay: Math.random() * 100, 
-              delay: Math.random() * 100, 
-              ease: 'Sine.easeInOut', 
-              y: tmp.y + Math.random() * 100, 
-              repeat: -1, 
-              yoyo: true,
-            onUpdate: ()=> {
-              i.position.setY(tmp.y);
-              if (i.body !== null && i.body !== undefined)
-                i.body.needUpdate = true; 
-            }});
-         });
 
-      //---------------------swanky velvet
+      //swanky velvet
 
         this.swankyVelvet = new ExtendedObject3D();
    
@@ -137,7 +126,10 @@ export class TargetPractice extends Scene3D {
     
         });
   }
-  public update(time: number): void
+
+  //---------------------------------------------------
+
+  public async update(time: number): Promise<void>
   {
 
       //this.timeElapsed = time;
@@ -146,11 +138,20 @@ export class TargetPractice extends Scene3D {
       if (typeof this.entities[entity].update === 'function')
         this.entities[entity].update(time);
 
+  //spawn more meatballs if empty array
+
+    if (this.meatballs.length <= 0 && this.gameState)
+      await Meatball.spawn(this, this.meatballs);
 
   }
 
+  //---------------------------------------------------
+
   public gameOver(): void
   {
+
+    this.gameState = false;
+
     this.swankyVelvet.anims.play('Laugh');
     this.time.addEvent(
       {delay: 5000, callback: ()=> this.swankyVelvet.anims.play(this.swankyVelvet.anims.current === 'Laugh' ? 

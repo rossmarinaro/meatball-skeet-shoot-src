@@ -1,12 +1,4 @@
 
-@font-face {
-	font-family: "Bangers";
-	src: url("assets/fonts/bangers-regular-webfont.woff") format("woff");
-}
-@font-face {
-	font-family:  "Digitizer";
-	src: url("assets/fonts/digitizer.woff") format("woff");
-}
 /**********************************************  MEDIA QUERIES */
 
 @media screen and (orientation: portrait)

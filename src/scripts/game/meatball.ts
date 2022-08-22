@@ -66,7 +66,7 @@ export class Meatball extends ExtendedObject3D {
 
     //------------------------- spawn
 
-    public static async spawn(scene: Scene3D, array: Meatball[])
+    public static async spawn(scene: Scene3D, array: Meatball[]): Promise<Meatball[]>
     {
       for (let i = 0; i < 10; i++)
       {
@@ -75,6 +75,29 @@ export class Meatball extends ExtendedObject3D {
             z = Phaser.Math.Between(-200, -220);
           array.push(new Meatball(scene, x, y, z));
       }
-      return;
+
+      //tweens
+
+       array.forEach((i: ExtendedObject3D) => {
+        let tmp = i.position.clone();
+         scene.tweens.add({
+           targets: tmp, 
+           duration: 5000, 
+           stagger: scene.tweens.stagger(100, {}),
+           repeatDelay: Math.random() * 100, 
+           delay: Math.random() * 100, 
+           ease: 'Sine.easeInOut', 
+           y: tmp.y + Math.random() * 100, 
+           repeat: -1, 
+           yoyo: true,
+         onUpdate: ()=> {
+           i.position.setY(tmp.y);
+           if (i.body !== null && i.body !== undefined)
+             i.body.needUpdate = true; 
+         }});
+      });
+
+      return array;
+
     }
   }

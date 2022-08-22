@@ -1,3 +1,13 @@
+
+@font-face {
+	font-family: "Bangers";
+	src: url("assets/fonts/bangers-regular-webfont.woff") format("woff");
+}
+@font-face {
+	font-family:  "Digitizer";
+	src: url("assets/fonts/digitizer.woff") format("woff");
+}
+
 #canvas-overlay{
 	background-color: #ff0000;
 	opacity: 0;

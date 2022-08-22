@@ -76,7 +76,6 @@ export default class Application {
         this.physics = {
             default: 'arcade'
         };
-        
 
     //--------------------array of stages / minigames within the game
 
@@ -88,13 +87,8 @@ export default class Application {
             new TargetPractice
 
         ];
-
-
-
-      
     }
-   
-    
+
 }
 
         
