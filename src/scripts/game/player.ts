@@ -142,12 +142,10 @@ export class Player {
 
           this.setState(this.currentEquipped.key === 'rolling_pin1' ? 'idle' : 'Rifle Idle');
 
-          if (this.isSelf === true)
-          {
             this.self.object.body.setVelocityX(0);
             this.self.object.body.setVelocityZ(0);  
             this.self.object.body.setAngularVelocityY(0);
-          }
+          
      
     }
 
@@ -178,7 +176,7 @@ export class Player {
     public move(forceX: number, forceY: number): void
     {
 
-      if (System.config.multiPlayer.chat === true || !this.raycaster)
+      if (/* System.config.multiPlayer.chat === true || */ !this.raycaster)
         return;
 
       const cam = this.scene.third.camera,

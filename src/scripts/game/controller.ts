@@ -148,7 +148,7 @@ export class Controller {
         //// lock the pointer and update the first person control
   
             this.scene.input
-            .on('pointerdown', () => !this.scene.scene.get('Menu3D').scene.settings.active && this.scene.input.mouse.requestPointerLock())
+            .on('pointerdown', () => /* !this.scene.scene.get('Menu3D').scene.settings.active &&  */this.scene.input.mouse.requestPointerLock())
             .on('pointermove', (pointer: Phaser.Input.Pointer) => {
                 if (this.scene.input.mouse.locked)
                 {
