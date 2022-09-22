@@ -35,14 +35,14 @@ export class Level extends ExtendedObject3D {
 
       //invisible barrier
   
-      const barrier: any = new THREE.Mesh(new THREE.BoxGeometry(180, 50, 5), new THREE.MeshLambertMaterial({color: 0xff0000}));
-      barrier.position.set(0, -20, -75);
-      barrier.visible = false;
-      barrier.shape = 'box';
-      barrier.name = 'barrier';
-      this.scene.third.add.existing(barrier);
-      this.scene.third.physics.add.existing(barrier); 
-      barrier.body.setCollisionFlags(2)
+      // const barrier: any = new THREE.Mesh(new THREE.BoxGeometry(180, 50, 5), new THREE.MeshLambertMaterial({color: 0xff0000}));
+      // barrier.position.set(0, -20, -75);
+      // barrier.visible = false;
+      // barrier.shape = 'box';
+      // barrier.name = 'barrier';
+      // this.scene.third.add.existing(barrier);
+      // this.scene.third.physics.add.existing(barrier); 
+      // barrier.body.setCollisionFlags(2)
   
       //sky box
 

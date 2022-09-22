@@ -8,6 +8,13 @@ export type orientation = {
     lock: (aspectRatio: OrientationLockType) => void
     unlock: () => void
 }
+export type ammo = {
+    automac1000: number
+    penne_pistol: number
+    rigatoni_rocket_launcher: number
+    grenade: number
+    dynamite: number
+} 
 
 export type parent = string
 export type backgroundColor = string

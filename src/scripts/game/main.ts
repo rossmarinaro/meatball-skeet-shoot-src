@@ -2,13 +2,14 @@
 import { AnimationClip } from 'three';
 import { Scene3D, ExtendedObject3D } from '@enable3d/phaser-extension';
 import { System } from '../internals/Config'
-
+import { Inventory3D } from './inventory';
 import { Lighting } from './lighting';
 import { Meatball } from './meatball';
 import { Player } from './player';
 import { HUD } from './hud';
 import { Controller } from './controller';
 import { Level } from './level';
+
 
 
 //------------------------------------------------ MAIN
@@ -45,6 +46,11 @@ export class TargetPractice extends Scene3D {
    this.rounds = rounds;
    this.timeLeft = 60.000;
    this.score = 0;
+   this._scene.data['currentStage'] = 'shooting range';
+   this.data['weapons'] = ['automac1000'];
+   this.data['items'] = [];
+   this.data['powerups'] = [];
+   Inventory3D.ammo.automac1000 = Infinity;
 
    System.config.audio.music.play(this._scene);
    scene.scene.stop('Background');
@@ -77,6 +83,8 @@ export class TargetPractice extends Scene3D {
       this.player = new Player(this);
       this.hud = new HUD(this, 'SkeetShoot');
       this.controller = new Controller(this, this.player);
+
+      Inventory3D.setItem(this, 'automac1000');
 
     //entities
       this.entities = [this.player];
