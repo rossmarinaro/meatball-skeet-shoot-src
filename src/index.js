@@ -1,6 +1,5 @@
 import './style.css';
-// import * as Tone from 'tone';
-import * as Phaser from 'phaser'
+
 import { enable3d } from '@enable3d/phaser-extension';   
 import Application from './scripts/internals/Application';
 
@@ -20,11 +19,10 @@ import Application from './scripts/internals/Application';
 
     window.onload = async ()=> {          
 
-        System.config = new Application(System); 
-        enable3d(() => System.game = new Phaser.Game(System.config))
+        System.Process.app = new Application(System.Process); 
+        enable3d(() => System.Process.game = new Phaser.Game(System.Process.app))
+        //.withPhysics('https://rossmarinaro.github.io/fps/wasm')
         .withPhysics('assets/wasm');
-
-
 
     }  
 

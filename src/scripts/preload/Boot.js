@@ -21,13 +21,23 @@ export class Boot extends Phaser.Scene {
 
         //utilities
 
-            System.utils = new Utils;
+            System.Process.utils = Utils;
             
         //game scale 
 
-            System.config.scale.scaleWidth = this.scale.width; 
-            System.config.scale.scaleHeight = this.scale.height;
-            System.config.scale.scaleRatio = System.config.scale.scaleWidth / System.config.scale.scaleHeight * 0.9; 
+            System.Process.app.scale.scaleWidth = this.scale.width; 
+            System.Process.app.scale.scaleHeight = this.scale.height;
+            System.Process.app.scale.scaleRatio = System.Process.app.scale.scaleWidth / System.Process.app.scale.scaleHeight * 0.9; 
+    
+        //call full screen if available
+    
+            this.input.on('pointerup', () => {
+                if (!this.scale.isFullscreen && this.scale.fullscreen.available)
+                {   
+                    this.scale.fullscreenTarget = document.getElementById(System.Process.app.parent);    
+                    this.scale.startFullscreen();
+                }
+            });
              
         }
         async preload()

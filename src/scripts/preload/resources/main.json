@@ -3,7 +3,10 @@
 {  
     
     "audio": [
+        { "huh": "assets/audio/sounds/huh.ogg" },
+        { "pistol_shot": "assets/audio/sounds/pistol_shot.ogg" },
         { "phryg1": "assets/audio/music/phrygian1.ogg" },
+        { "al_electro": "assets/audio/music/al_electro.ogg" },
         { "airhorn": "assets/audio/sounds/airhorn.ogg" },
         { "automac1000_shot": "assets/audio/sounds/automac1000.ogg" },
         { "fire_fx": "assets/audio/sounds/fire.ogg" }

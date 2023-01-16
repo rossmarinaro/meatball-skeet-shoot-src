@@ -130,7 +130,7 @@ export class Preload extends Phaser.Scene {
             this.progressBarGraphics.fillGradientStyle(0xff0000, 0xff0000, 0xFCB144, 0xFCB144, 1).fillRoundedRect((60 / 100) * width, (87.4 / 100) * height, (76 / 100) * width * value, 30, 2);
     //// destroy progress bar
             if (this.percentText._text === '100%')
-                System.config.gameState === true ? 
+                System.Process.gameState === true ? 
                     this.destroyProgressBar() : scene.time.delayedCall(3000, ()=> this.destroyProgressBar());  
         })
         .on('fileprogress', file => this.assetText.setText(file.key)); 
@@ -149,7 +149,7 @@ export class Preload extends Phaser.Scene {
         this.stageText.destroy();
         this.assetText.destroy();
 
-        this.scene.run('TargetPractice', [this, 1]);
+        this.scene.run('SkeetShoot', [this, 1]);
     }
 
     

@@ -1,89 +1,193 @@
 
-
-import { THREE, ExtendedObject3D, Scene3D, FirstPersonControls } from '@enable3d/phaser-extension';
-import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import * as ENABLE3D from '@enable3d/phaser-extension';
 import { System } from '../internals/Config';
+import { Actor } from './Actor';
 
-import { ItemProp } from './ItemProp';
-import { Inventory3D } from './inventory';
 
 //------------------------------------------------- player
 
-export class Player {
+export class Player3D extends Actor {
 
-    private scene: Scene3D 
-    private currentEquipped: any
+    private currentEquipped: { key: string, obj: any, quantity: number } = {key: '', obj: null, quantity: 0}
+
     private collide: boolean
     private isSelf: boolean | undefined
-    private equipped: any
     private canJump: boolean
 
-    public raycaster: THREE.Raycaster
-    public id: string | undefined
+    public initialized: boolean = false
+    public objType: string = 'player'
+    public raycaster: ENABLE3D.THREE.Raycaster | null = null
     public data: any
     public username: string | null
+    public playerID: string | undefined
     public color: string
-    public anims: string
     public alive: boolean
-    public movement = {x: 0, y: 0, z: 0}
+    public movement: { x: number, y: number, z: number, direction: string | null } = { x: 0, y: 0, z: 0, direction: null }
     public rotationSpeed: number
-    public health: number
-    public hitbox: any
-    public itemProp: ItemProp | null
-    public self = {
-      skin: new ExtendedObject3D(),
-      object: new ExtendedObject3D() 
-    }
+    public health: number = 10
+    public itemProp: Actor | null = null
+    public rigidBody: ENABLE3D.ExtendedObject3D
 
-    constructor(scene: Scene3D | any, isSelf?: boolean, data?: any)
+    constructor (
+
+      scene: ENABLE3D.Scene3D,  
+      posX: number, 
+      posY: number, 
+      posZ: number, 
+      isSelf?: boolean, 
+      data?: any
+
+    )
     {
-      this.scene = scene;
-      this.isSelf = isSelf;
-      this.data = data;
-      this.health = this.data ? this.data.health : Infinity;
-      this.id = this.data ? this.data.id : 0;
-      this.username = this.data ? this.data.username : null; 
-      this.color = 'yellow';
-      this.alive = true;
-      this.collide = false;
-      this.canJump = false;
-      this.hitbox = null;
-      this.anims = '';
-
-      this.currentEquipped = {
-        key: 'automac1000',
-        obj: null,
-        quantity: 0
-      };
-
-      this._init();
-    }
+      super(scene, 'bh_model', true, false, () => {
+        
+        this.isSelf = isSelf;
+        this.data = data;
+        this.health = data ? data.health : Infinity;
+        this.playerID = data ? data.id : 0;
+        this.username = data ? data.username : null; 
+        this.color = data ? data.skin : 'red';
+        this.alive = true;
+        this.collide = false;                
+        this.canJump = false;
   
-    private _init(): void
-    {
+        if (this.isSelf === true)
+        {
+          this.rigidBody = new ENABLE3D.ExtendedObject3D;  
+          this.rigidBody.position.set(posX, posY, posZ);
+        }
 
+      //current-equipped data
 
+      const capsuleBody = {
+        shape: 'capsule', 
+        mass: 1.8, 
+        radius: 3, 
+        offset: { y: 5 }, height: 10
+      },
 
-        this.scene.third.physics.add.existing(this.self.object, {shape: 'capsule', mass: 1.8, radius: 3, offset: { y: 5 }, height: 30});
-        this.self.object.body.setAngularFactor(0, 0, 0);
-        this.self.object.body.setFriction(0.1);
-        this.self.object.body.setGravity(0, -200, 0);
-        this.self.object.body.setPosition(150, 0, 50);
+      startingWeapon = this.data ? this.data.currentEquipped : 'rolling_pin1';
 
+      scene.data['weapons'].push(startingWeapon);
 
-        this.self.object.body.on.collision(async (otherObject, event) => {
+        this.currentEquipped = {
+          key: startingWeapon,
+          obj: null,
+          quantity: 0
+        };
 
-          if (otherObject.name === 'ladder')
-            this.self.object.body.setVelocityY(100);
-     
-        //listen for items / aquires pickup in map
+        this.idle();
 
-          Inventory3D.aquirePickup(this.scene, otherObject);
+        this.traverse((i: any) => {                                  
+              
+          //------------------load texture
+  
+            if (i.isMesh)
+            {                            
 
+              if (i.geometry.attributes.uv && i.name === 'body')
+                this.scene.third.load
+                .texture(`bh_uv_${this.color}`)
+                .then(texture => {
+
+                    i.material.map = texture;
+
+                    this.position.set(posX, posY, posZ);
+                    this.scene.third.add.existing(this);
+                    this.scene.third.physics.add.existing(this, capsuleBody); 
+                    this.body.setCollisionFlags(6);  
+
+                    if (this.isSelf === true)
+                    {
+
+                    //set default weapon
+
+                      System.Process.app.ThirdDimension.Inventory3D.setItem(this.scene, this.currentEquipped.key); 
+
+                   
+                      this.scene.third.physics.add.existing(this.rigidBody, capsuleBody);
+                      
+                      this.rigidBody.body.setAngularFactor(0, 0, 0);
+                      this.rigidBody.body.setFriction(0.1);
+                      this.rigidBody.body.setGravity(0, -200, 0);
+                      this.rigidBody.body.setPosition(posX, posY, posZ);
+                     
+                      this.rigidBody.body.on.collision(async (otherObject, event) => { 
+
+                        if (otherObject.name === 'ladder')
+                          this.rigidBody.body.setVelocityY(100);
+                  
+                      //listen for items / aquires pickup in map
+
+                        System.Process.app.ThirdDimension.Inventory3D.aquirePickup(this.scene, otherObject);
+            
+                      });
+                    }
+                  }); 
+          
+                i.castShadow = i.receiveShadow = true;
+  
+                if (i.material)
+                {
+                  i.material.metalness = 0.3;
+                  i.material.roughness = 0.3;
+                }
+            }
+            if (i.name === 'mixamorigRightHandIndex1') //sets player's third person item
+            {
+
+              let itemOrigin: ENABLE3D.ExtendedObject3D | null = null;
+
+              if (itemOrigin === null)
+              {
+  
+                itemOrigin = this.scene.third.add.box({width: 1, height: 1, depth: 1});
+                itemOrigin.visible = false;
+                                              
+                Promise.resolve().then(
+  
+                  ()=>{   
+         
+                      const pos = new ENABLE3D.THREE.Vector3();
+  
+                      this.scene.events.on('update', ()=> {
+            
+                        i.getWorldPosition(pos);
+  
+                        itemOrigin?.position.copy(pos); 
+  
+                        if (this.itemProp !== null)
+                        {
+                          this.itemProp.position.copy(pos);
+                          this.itemProp.rotation.y = this.obj.rotation.y//* 0.25;
+                        }
+
+                        i.attach(itemOrigin);
+
+                        if (this.hasBody)
+                          this.body.needUpdate = true; 
+  
+                      });
+                  });
+              }
+            }
         });
+      
+      //sets 3d model's origin
 
+        this.obj.position.set(0, -13, 0); 
+        this.obj.rotation.set(0, -140, 0);
+
+        //initialized
+ 
+        this.initialized = true;
+
+        //update
+
+        scene.events.on('update', (time: number): void => this.update(time));
+
+      });
     }
-
 
   //------------------------------------------------ set players animation state
 
@@ -91,6 +195,12 @@ export class Player {
     private setState(state: string | null): void
     {
 
+      if (state === this.anims.current || state === null)
+        return;
+
+        this.anims.play(state);
+
+        System.Process.app.events.socketEmit('DEATHMATCH: player anims', state);
     }
 
  
@@ -123,9 +233,11 @@ export class Player {
     public crouch(): void
     {
 
-      this.movement.x = THREE.MathUtils.lerp(this.movement.x,this.movement.x - 0.5, 0.2);
-      this.movement.y = THREE.MathUtils.lerp(this.movement.y, this.movement.y - 1, 0.2);   
-      this.self.object.body.setAngularVelocityY(0);
+      this.movement.x = ENABLE3D.THREE.MathUtils.lerp(this.movement.x,this.movement.x - 0.5, 0.2);
+      this.movement.y = ENABLE3D.THREE.MathUtils.lerp(this.movement.y, this.movement.y - 1, 0.2);   
+      
+      if (this.isSelf)
+        this.rigidBody.body.setAngularVelocityY(0);
       //this.scene.third.camera.position.y -= 10;
 
     }
@@ -136,17 +248,20 @@ export class Player {
     public idle(): void
     {
 
-      //this.self.skin.rotation.y = 1;
-      //if (this.self.skin.anims.current)
-       // return;
+      this.setState(
+        this.currentEquipped.key === 'rolling_pin1' ? 
+        'idle' : 'Rifle Idle'
+      );
 
-          this.setState(this.currentEquipped.key === 'rolling_pin1' ? 'idle' : 'Rifle Idle');
+      if (this.isSelf === true && this.rigidBody.body)
+      {
 
-            this.self.object.body.setVelocityX(0);
-            this.self.object.body.setVelocityZ(0);  
-            this.self.object.body.setAngularVelocityY(0);
-          
-     
+        this.rigidBody.body.setVelocityX(0);
+        this.rigidBody.body.setVelocityZ(0);  
+        this.rigidBody.body.setAngularVelocityY(0);  
+        this.movement.direction = null;
+      }
+        
     }
 
 
@@ -163,9 +278,10 @@ export class Player {
 
       this.setState('jump');
       
-     // System.config.audio.play('huh', 1, false, this.scene, 0); 
+      System.Process.app.audio.play('huh', 1, false, this.scene, 0); 
 
-      this.self.object.body.applyImpulse({x: 0, y: 150, z: 0}, {x: 0, y: -200, z: 0})
+      if (this.isSelf === true)
+        this.rigidBody.body.applyImpulse({x: 0, y: 150, z: 0}, {x: 0, y: -200, z: 0})
 
     }
 
@@ -176,8 +292,8 @@ export class Player {
     public move(forceX: number, forceY: number): void
     {
 
-      if (/* System.config.multiPlayer.chat === true || */ !this.raycaster)
-        return;
+      if (!this.alive || System.Process.app.multiPlayer.chat === true || !this.raycaster)
+        return; 
 
       const cam = this.scene.third.camera,
             direction = cam.getWorldDirection(this.raycaster.ray.direction),
@@ -186,68 +302,57 @@ export class Player {
 
           direction.normalize();
 
+      if (!this.rigidBody.body)
+        return;
+
     //right
+
       if (forceX > 40) 
       {
-        this.self.object.body.setVelocityX(-z);
-        this.self.object.body.setVelocityZ(x);
+        this.rigidBody.body.setVelocityX(-z);
+        this.rigidBody.body.setVelocityZ(x);
+        this.movement.direction = 'right'; 
       }
 
     //left
+
       else if (forceX < -40) 
       {  
-        this.self.object.body.setVelocityX(z);
-        this.self.object.body.setVelocityZ(-x);
+        this.rigidBody.body.setVelocityX(z);
+        this.rigidBody.body.setVelocityZ(-x);
+        this.movement.direction = 'left';
       }
+
     //down
+
       else if (forceY < -40) 
       {
-        this.self.object.body.setVelocityX(x);
-        this.self.object.body.setVelocityZ(z);
+        this.rigidBody.body.setVelocityX(x); 
+        this.rigidBody.body.setVelocityZ(z);
+        this.movement.direction = 'down';
       }
+
     //up
+
       else if (forceY > 40) 
       {
-        this.self.object.body.setVelocityX(-x);
-        this.self.object.body.setVelocityZ(-z);
+        this.rigidBody.body.setVelocityX(-x);
+        this.rigidBody.body.setVelocityZ(-z); 
+        this.movement.direction = 'up';
       }
 
-      this.setState(this.currentEquipped.key === 'rolling_pin1' ? 'run_no_gun' : 'Rifle Run');
+     
+      this.setState(
+        this.currentEquipped.key === 'rolling_pin1' ? 
+        'run_no_gun' : 'Rifle Run'
+      );
 
-      if (this.self.object.body) 
-        this.self.object.body.setAngularVelocityY(0);
+      if (this.rigidBody.body) 
+        this.rigidBody.body.setAngularVelocityY(0);
 
+     
     }
     
-
-    //-------------------------------------------- player look
-
-
-    public look(x: number, y: number, camera: FirstPersonControls): void
-    {
-        
-      camera.update(x, y);
-      
-    //object's body rotates with camera
-
-      const 
-      v3 = new THREE.Vector3(),
-      rotation = this.scene.third.camera.getWorldDirection(v3),
-      theta = Math.atan2(rotation.x, rotation.z),
-      rotationMan = this.self.object.getWorldDirection(v3),
-      thetaMan = Math.atan2(rotationMan.x, rotationMan.z),
-      l = Math.abs(theta - thetaMan);
-    
-      this.rotationSpeed = 2; //4//isTouchDevice ? 2 : 4
-    
-      let d = Math.PI / 24
-
-      if (l > d && l > Math.PI - d || theta < thetaMan) 
-        this.rotationSpeed *= -1; 
-      if (this.self.object.body) 
-        this.self.object.body.setAngularVelocityY(this.rotationSpeed); 
-
-    }
 
   //------------------------------------------------- player attack
 
@@ -258,27 +363,25 @@ export class Player {
       if (!this.alive)
         return;
         
-      const getCurrentWeapon = async ()=> {
+      const getCurrentItem = async () => {
+
+        this.currentEquipped.obj.fire();
 
         switch (this.currentEquipped.key)
         {
-          case 'automac1000': 
+  
+            case 'rolling_pin1': return 'strike';
+            case 'penne_pistol': return 'Pistol Shoot';
+            case 'automac1000': return 'Rifle Shoot';
 
-            this.scene.third.load.gltf('bullet_3d').then((gltf: GLTF) => this.currentEquipped.obj.fire(gltf));
-            return 'Rifle Shoot';
-
-          case 'rolling_pin1': 
-            
-            this.currentEquipped.obj.fire();
-            return 'strike';
-
-          default: return null;
+            default: return null;
         }
-        
-      },
-      attack = await getCurrentWeapon();
+      }, 
+      
+      attack = await getCurrentItem();
 
       this.setState(attack);
+
     }
 
   //--------------------------------------------- init powerup
@@ -289,7 +392,7 @@ export class Player {
     {
       case 'ikura_maki_tile':
         this.health += 4;
-        System.config.audio.play('gulp', 1, false, this.scene, 0);
+        System.Process.app.audio.play('gulp', 1, false, this.scene, 0);
       break;
     }
   }
@@ -328,10 +431,28 @@ export class Player {
       if (equipped === 'rolling_pin1')
         return;
 
-      let pos = this.self.skin.position; 
-      new ItemProp(this.scene, equipped, pos.x, pos.y - 5, pos.z);
+      const pos = this.position; 
+      new System.Process.app.ThirdDimension.Inventory3D.pickup(this.scene, equipped, pos.x, pos.y - 5, pos.z);
     }
 
+
+  //----------------------------------------------- swap item / weapon
+
+    public swapItem (data: any): void
+    {
+
+      if (this.itemProp !== null)
+        this.itemProp.remove(this.itemProp.children[0]);
+
+      this.currentEquipped.key = data.item.key;
+      this.itemProp = new Actor(this.scene, data.item.key, true, false, () => {
+        this.itemProp?.traverse((i: any): void => {
+          this.scene.third.add.existing(this.itemProp);
+          System.Process.app.ThirdDimension.Inventory3D.setItemForThirdPerson(this.itemProp, i);
+          this.idle();
+        });
+      });
+    }
   
   //----------------------------------------------- update on scene
 
@@ -339,54 +460,112 @@ export class Player {
     public update(time: number): void
     {
 
-      if (this.currentEquipped.obj === null)
-        return;
+      this.health = Math.ceil(this.health);
 
-        this.health = Math.ceil(this.health);
-  
-        this.raycaster = new THREE.Raycaster();
-        const pos = new THREE.Vector3(),
+      if (this.isSelf === true && this.rigidBody.body) 
+      {
+
+        const pos = new ENABLE3D.THREE.Vector3, 
               movementY = (num: number) => { return num - this.movement.y };
-  
-        this.raycaster.setFromCamera({ 
+
+      this.raycaster = new ENABLE3D.THREE.Raycaster;
+
+      this.raycaster.setFromCamera(
+        { 
           x: 0.6 - this.movement.x, 
-          y: System.isPortrait(this.scene) || System.isDesktop(this.scene) ? movementY(-0.8) : movementY(-0.5) 
-        }, 
-        this.scene.third.camera); 
-  
-        pos.copy(this.raycaster.ray.direction);
-        pos.multiplyScalar(0.8 + this.movement.z);
-        pos.add(this.raycaster.ray.origin);
-  
-        this.currentEquipped.obj.visible = this.alive === true ? true : false; 
+          y: System.Config.isPortrait(this.scene) || System.Config.isDesktop(this.scene) ? movementY(-0.8) : movementY(-0.5) 
+        }, this.scene.third.camera
+      ); 
+
+      this.raycaster.ray.origin.copy(this.scene.third.camera.position);
+
+      pos.copy(this.raycaster.ray.direction);
+      pos.multiplyScalar(0.8 + this.movement.z);
+      pos.add(this.raycaster.ray.origin);
+
+      const direction = this.scene.third.camera.getWorldDirection(this.raycaster.ray.direction);
+
+      //set skin's rotation
+
+        this.rotation.y = this.movement.direction === 'up' ? 
+        -Math.atan2(direction.x, direction.z) : 
+        -Math.atan2(direction.z, direction.x);
+
+      //swap player fp weapon perspective view
+
+      if (this.currentEquipped.obj)
+      {
+        if (this.alive === true && this.itemProp)
+        {
+          if (this.scene['controller'].perspectiveControls.type === 'first')
+          {
+            this.currentEquipped.obj.visible = true;
+            this.itemProp.visible = false;
+            this.visible = false;
+          } 
+          else
+          {
+            this.currentEquipped.obj.visible = false;
+            this.itemProp.visible = true;
+            this.visible = true;
+          }
+        }
+
         this.currentEquipped.obj.position.copy(pos);
-        this.currentEquipped.obj.rotation.copy(this.scene.third.camera.rotation);
+        this.currentEquipped.obj.rotation.copy(this.scene.third.camera.rotation);   
+      }
 
-        this.raycaster.ray.origin.copy(this.scene.third.camera.position);
+   
+        //copy player's skin position to its physics body
 
-        this.anims = this.self.skin.anims.current;
+        if (this['obj'])
+          this.position.copy(this.rigidBody.position);
 
-        if (this.collide === true)
+        this.rigidBody.body.needUpdate = true;
+        this.rigidBody.body.on.collision((otherObject, event) => {
+
+        if (event !== 'end')
+          this.collide = true;
+        else 
+        {
+          this.collide = false;
+          //this.onRamp = false;
+        } 
+        // otherObject.traverse((i: any) => {
+        //   if (i.name === 'ramp')
+        //   {
+        //     this.onRamp = true;
+        //     this.rigidBody.body.setVelocityY(0);
+        //   }
+        // });
+
+        }); 
+
+        
+        if (this.collide && this.body.velocity.y <= 0)
           this.canJump = true;
 
-        this.self.object.body.on.collision((otherObject, event) => {
+      }
 
-          if (event !== 'end')
-           this.collide = true;
-          else 
-          {
-            this.collide = false;
-            //this.onRamp = false;
-          } 
-          // otherObject.traverse((i: any) => {
-          //   if (i.name === 'ramp')
-          //   {
-          //     this.onRamp = true;
-          //     this.self.object.body.setVelocityY(0);
-          //   }
-          // });
 
-        });
+      //hide third person player / weapon if dead
+
+      if (!this.alive && this.itemProp)
+      {
+        this.visible = false;
+        this.itemProp.visible = false;
+      }
+    }
+
+    //--------------------------------- destroy
+
+    public destroy(): void
+    {
+      this.alive = false;
+      this.dropItem(this.currentEquipped.key);
+      this.remove(this.children[0]);    
+      if (this.hasBody === true && this.body)
+        this.scene.third.destroy(this);
     }
   }
   

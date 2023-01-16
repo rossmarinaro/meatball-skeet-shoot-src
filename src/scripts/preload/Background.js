@@ -15,15 +15,15 @@ export class Background extends Phaser.Scene {
         //-------------------- shaders
 
             case 'preload': 
-                this.shader = System.config.shaders.base.checkers; 
+                this.shader = System.Process.shaders.base.checkers; 
                 this.add.shader(this.shader, this.scale.width / 2, this.scale.height / 2, this.cameras.main.width, this.cameras.main.height);
             break;
             case 'intro': 
-                this.shader = System.config.shaders.base.vortex; 
+                this.shader = System.Process.shaders.base.vortex; 
                 this.add.shader(this.shader, this.scale.width / 2, this.scale.height / 2, this.cameras.main.width, this.cameras.main.height);
-                this.shader2 = System.config.shaders.base.disco; 
+                this.shader2 = System.Process.shaders.base.disco; 
                 this.add.shader(this.shader2, this.scale.width / 2, this.scale.height / 2, this.cameras.main.width, this.cameras.main.height);
-                this.cameras.main.setPostPipeline(System.config.shaders.post.hueRotate);
+                this.cameras.main.setPostPipeline(System.Process.shaders.post.hueRotate);
             break;
 
 
@@ -37,7 +37,7 @@ export class Background extends Phaser.Scene {
                 this.tileSprites3 = []; 
                 this.tileSprites4 = [];
                 this.add.image(500, 200, 'pixel').setScale(270);
-                this.discoShader = System.config.shaders.base.disco2; 
+                this.discoShader = System.Process.shaders.base.disco2; 
                 this.add.shader(this.discoShader, this.scale.width / 2, this.scale.height / 2, this.cameras.main.width, this.cameras.main.height);
                 let frames_0 = ['', '', '', '', ''],
                     frames_1 = ['', '', '', '', ''],
@@ -69,9 +69,9 @@ export class Background extends Phaser.Scene {
                     this.tweens.add({targets: this.tileSprites4[z], alpha: {value: 1, duration: 8000, ease: 'Power1'}, yoyo: true, repeat: -1});
                 }
                 this.loaded = true;
-                this.fireShader = System.config.shaders.base.fire;
+                this.fireShader = System.Process.shaders.base.fire;
                 this.add.shader(this.fireShader, this.scale.width / 2, this.scale.height / 2, this.cameras.main.width, this.cameras.main.height);
-                this.cameras.main.setPostPipeline(System.config.shaders.post.hueRotate);
+                this.cameras.main.setPostPipeline(System.Process.shaders.post.hueRotate);
             break;
 
             case 'blank':

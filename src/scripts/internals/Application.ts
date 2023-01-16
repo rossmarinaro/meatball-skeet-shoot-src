@@ -2,19 +2,23 @@
 
 import * as types from '../../../typings/types'
 
-import { Config, System } from './Config';
+import { System } from './Config';
+import { Game } from '../game/game';
 import { AudioManager } from './Audio';
 import { AjaxManager } from '../ajax.js';
-import { Boot } from '../preload/Boot.js';
-import { Preload } from '../preload/Preload.js';
-import { Background } from '../preload/Background.js';
-import { TargetPractice } from '../game/main';
+import { Text } from './Text';
+import { ThirdDimension } from './ThirdDimension';
+import { EventManager } from './Events';
 
 
 export default class Application {
 
-    public ajax: AjaxManager
-    public audio: AudioManager
+    public game: typeof Game = Game
+    public ajax: typeof AjaxManager = AjaxManager
+    public audio: typeof AudioManager = AudioManager
+    public events: typeof EventManager = EventManager
+    public text: typeof Text = Text
+    public ThirdDimension: typeof ThirdDimension = ThirdDimension
     public scale: any
     public pipeline: any[]
 
@@ -36,12 +40,8 @@ export default class Application {
 
 //-----------------------------------------------------------
 
-    constructor(system: Config)
+    constructor(system: System.Config)
     {  
-        
-        this.ajax = new AjaxManager;
-        this.audio = new AudioManager;
-
 
         this.type = Phaser.WEBGL;
         this.transparent = true,
@@ -79,14 +79,7 @@ export default class Application {
 
     //--------------------array of stages / minigames within the game
 
-        this.scene = [
-
-            new Boot,
-            new Preload, 
-            new Background,
-            new TargetPractice
-
-        ];
+        this.scene = Game.scene;
     }
 
 }
