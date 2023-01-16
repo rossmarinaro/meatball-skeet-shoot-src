@@ -28,7 +28,7 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
     super({ key: 'SkeetShoot' });
   }
 
-  public init([scene, rounds]): void
+  private init([scene, rounds]): void
   {
 
    this._scene = scene;
@@ -51,7 +51,7 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
     System.Process.app.game.init(this);
 
-    System.Process.app.ThirdDimension.create(this, 'room', [0, 0, 0, true, { skin: 'red', currentEquipped: 'automac1000' }]);  //apply defaults
+    System.Process.app.ThirdDimension.create(this, 'room', [0, 0, 0, true, { currentEquipped: 'automac1000' }]);  //apply defaults
 
     //spawn meatball targets
 
@@ -87,10 +87,8 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
     this.third.camera.lookAt(0, 0, 0);
     System.Process.app.audio.play('airhorn', 1, false, this, 0); 
-    this._scene.data['spawnPoint'] = 'Middle Yeast';
-    this._scene.data['currentStage'] = 'Meatball Mountain';
-    this._scene.scene.start('Quest');
-    this._scene.scene.stop('SkeetShoot');
+
+    this.time.delayedCall(4000, () => this._scene.scene.restart([this._scene, 1]));
   }
 
 

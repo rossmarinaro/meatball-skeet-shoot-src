@@ -5,7 +5,7 @@ import * as types from '../../../typings/types'
 import { System } from './Config';
 import { Game } from '../game/game';
 import { AudioManager } from './Audio';
-import { AjaxManager } from '../ajax.js';
+import { AjaxManager } from './Ajax';
 import { Text } from './Text';
 import { ThirdDimension } from './ThirdDimension';
 import { EventManager } from './Events';

@@ -46,7 +46,7 @@ export class Player3D extends Actor {
         this.health = data ? data.health : Infinity;
         this.playerID = data ? data.id : 0;
         this.username = data ? data.username : null; 
-        this.color = data ? data.skin : 'red';
+        this.color = data && data.skin ? data.skin : 'red';
         this.alive = true;
         this.collide = false;                
         this.canJump = false;
@@ -292,7 +292,7 @@ export class Player3D extends Actor {
     public move(forceX: number, forceY: number): void
     {
 
-      if (!this.alive || System.Process.app.multiPlayer.chat === true || !this.raycaster)
+      if (!this.alive /* || System.Process.app.multiPlayer.chat === true */ || !this.raycaster)
         return; 
 
       const cam = this.scene.third.camera,

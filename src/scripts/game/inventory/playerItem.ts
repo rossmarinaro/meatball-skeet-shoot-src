@@ -16,6 +16,7 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
   public player: typeof System.Process.app.ThirdDimension.Player3D | null
   public source: string
   public controls: any
+  public zoomY: number = 0.6
 
   constructor(scene: ENABLE3D.Scene3D, name: string, flipY?: boolean) 
   {
@@ -25,31 +26,31 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
     this.scene = scene;
     this.name = name;
     this.flipY = flipY;
+    this.controls = this.scene['controller'];
     this.player = this.scene['player'] ? this.scene['player'] : null;
     this.source = this.player.data ? this.player.data.username : null;
 
-    this.init(this.player.data ? this.player.data.skin : 'red');
+    this.init();
 
   }
 
 
   //-------------------------------------------
 
-  private async init(color: string): Promise<void> 
+  private async init(): Promise<void> 
   {
 
-    this.controls = this.scene['controller'].perspectiveControls;
+    const playerColor = this.player.data && this.player.data.skin ? this.player.data.skin : 'red',
+          gloveColor = await this.player.getGloveColor(playerColor);
 
-    const gloveColor = await this.player.getGloveColor(color);
-
-    this.scene['third'].load.gltf(this.name).then((glb: typeof System.Process.utils.GLTF) => {
+    this.scene.third.load.gltf(this.name).then((glb: typeof System.Process.utils.GLTF) => {
 
       this.add(glb.scene);
 
       for (let i in glb.animations)
         this.anims.add(glb.animations[i].name, glb.animations[i]);
 
-      this.scene['third'].animationMixers.add(this.anims.mixer);
+      this.scene.third.animationMixers.add(this.anims.mixer);
 
       this.obj = glb;
 
@@ -59,10 +60,10 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
           child.position.z -= 0.15;
 
         if (child.name === 'glove')
-          this.scene['third'].load.texture(`glove_${gloveColor}`).then(texture => {
+          this.scene.third.load.texture(`glove_${gloveColor}`).then(texture => {
             child.material.map = texture;
             child.material.map.flipY = this.flipY;
-            this.scene['third'].add.existing(this);
+            this.scene.third.add.existing(this);
           });
 
         if (child.name === 'muzzle') 
@@ -93,7 +94,7 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
   public async getCurrentPosition(): Promise<{ x: number, y: number, z: number }> 
   {
 
-    const direction = this.scene['third'].camera.getWorldDirection(this.player.raycaster.ray.direction);
+    const direction = this.scene.third.camera.getWorldDirection(this.player.raycaster.ray.direction);
 
     return {
       x: direction.x,

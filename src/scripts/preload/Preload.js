@@ -16,16 +16,7 @@ export class Preload extends Phaser.Scene {
         this.progressBox2 = {};
         this.progressOverlay = {};
         this.loadIterator = {};
-        this.assetsLoaded = {
-            images: false,
-            audio: false,
-            obj: false,
-            atlas: false,
-            spritesheet: false,
-            tilemapTiledJSON: false,
-            gltf: false
-        };
-        
+
         this.preload3D = async (scene, scene3d) =>{
             scene.scene.launch('Background', 'blank');
             await parseResources(scene3d, scene.cache.json.get('resources_3d'));

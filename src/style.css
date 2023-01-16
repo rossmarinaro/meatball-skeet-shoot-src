@@ -1,13 +1,3 @@
-
-@font-face {
-	font-family: "Bangers";
-	src: url("assets/fonts/bangers-regular-webfont.woff") format("woff");
-}
-@font-face {
-	font-family:  "Digitizer";
-	src: url("assets/fonts/digitizer.woff") format("woff");
-}
-
 #canvas-overlay{
 	background-color: #ff0000;
 	opacity: 0;
@@ -19,7 +9,7 @@
 	color: #ff0000;
 	margin: auto 0;
 	text-align:center;
-	-webkit-text-stroke: 0.06rem black;
+	-webkit-text-stroke: 0.06rem #000000;
 }
 
 #input-bar{
@@ -32,7 +22,8 @@
 
 
 #modal{
-	position:relative;
+
+	position: relative;
 	margin: auto;
 }
 
@@ -132,7 +123,7 @@
 	display: block;
 	margin: 0 auto;
 }
-.digitizer p:hover{
+.digitizer p:hover:not(#login-text){
 	color: #ff0000;
 }
 ul:hover{

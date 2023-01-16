@@ -207,7 +207,7 @@ export class Controller3D {
   
             this.scene.input
 
-            .on('pointerdown', () => !this.scene.scene.get('Menu3D').scene.settings.active && this.scene.input.mouse.requestPointerLock())
+            .on('pointerdown', () => /* !this.scene.scene.get('Menu3D').scene.settings.active && */ this.scene.input.mouse.requestPointerLock())
 
             .on('pointermove', (pointer: Phaser.Input.Pointer) => {
 
@@ -339,7 +339,7 @@ export class Controller3D {
     private zoomWeapon(): void
     {
       //this.crossHairs.alpha = 0
-      this.player.movement.x = ENABLE3D.THREE.MathUtils.lerp(this.player.movement.x, this.player['currentEquipped'].obj.zoomY, 0.2);
+      this.player.movement.x = ENABLE3D.THREE.MathUtils.lerp(this.player.movement.x, this.player.currentEquipped.obj.zoomY, 0.2); 
       this.player.movement.y = ENABLE3D.THREE.MathUtils.lerp(this.player.movement.y, 1, 0.2);
       this.player.movement.z = ENABLE3D.THREE.MathUtils.lerp(this.player.movement.z, -0.45, 0.2);
     }
