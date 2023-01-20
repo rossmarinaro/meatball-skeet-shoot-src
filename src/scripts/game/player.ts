@@ -66,7 +66,7 @@ export class Player3D extends Actor {
         offset: { y: 5 }, height: 10
       },
 
-      startingWeapon = this.data ? this.data.currentEquipped : 'rolling_pin1';
+      startingWeapon = this.data && this.data.currentEquipped ? this.data.currentEquipped : 'rolling_pin1';
 
       scene.data['weapons'].push(startingWeapon);
 

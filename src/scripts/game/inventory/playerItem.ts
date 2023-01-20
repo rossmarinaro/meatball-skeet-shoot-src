@@ -40,9 +40,6 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
   private async init(): Promise<void> 
   {
 
-    const playerColor = this.player.data && this.player.data.skin ? this.player.data.skin : 'red',
-          gloveColor = await this.player.getGloveColor(playerColor);
-
     this.scene.third.load.gltf(this.name).then((glb: typeof System.Process.utils.GLTF) => {
 
       this.add(glb.scene);
@@ -60,7 +57,7 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
           child.position.z -= 0.15;
 
         if (child.name === 'glove')
-          this.scene.third.load.texture(`glove_${gloveColor}`).then(texture => {
+          this.scene.third.load.texture('glove_yellow').then(texture => {
             child.material.map = texture;
             child.material.map.flipY = this.flipY;
             this.scene.third.add.existing(this);
@@ -197,6 +194,7 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
 
         new this.bullet(this, 2, 'penne_3d');
 
+
         break;
 
       case 'automac1000':
@@ -253,6 +251,8 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
     this.canAttack = true;
     this.anims.mixer.stopAllAction();
   }
+
+
 
 
 }

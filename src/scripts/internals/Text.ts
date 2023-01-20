@@ -43,12 +43,12 @@ export class Text {
 
         scene: Phaser.Scene, 
         textType: string, 
-        textColor: string | number, 
-        options: boolean, 
-        optionsArray: string[] | undefined, 
         content: string, 
-        stage: string, 
-        bool: boolean
+        textColor?: string | number, 
+        options?: boolean, 
+        optionsArray?: string[] | undefined, 
+        stage?: string, 
+        bool?: boolean
 
     ): Promise<string>
     {
@@ -70,7 +70,7 @@ export class Text {
 
             let isSelectable = textType === 'select' || textType === 'dialog' ? true : false;
 
-            if (isSelectable)
+            if (isSelectable && stage && bool)
             {
                 scene.time.delayedCall(1500, ()=> this.setInteractiveText(scene, stage, bool));
                 this.textContent = [];

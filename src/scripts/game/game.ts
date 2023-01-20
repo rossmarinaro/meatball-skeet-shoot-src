@@ -1,9 +1,8 @@
 
 import { System } from '../internals/Config';
-import { Boot } from '../preload/Boot';
-import { Preload } from '../preload/Preload';
-import { Background } from '../preload/Background.js';
+
 import { SkeetShoot } from '../game/main';
+
 
 export class Game {
  
@@ -23,22 +22,11 @@ export class Game {
 
     public static scene: Phaser.Scene[] = [
 
-        new Boot,
-        new Preload, 
-        new Background,
         new SkeetShoot
-
 
     ];
 
-    public static async init (
-
-        scene: Phaser.Scene, 
-        playerArgs?: any[], 
-        spawnEnemies?: boolean, 
-        spawnPickups?: boolean
-
-    ): Promise<void>    
+    public static async init (scene: Phaser.Scene): Promise<void>    
     { 
 
 
@@ -54,56 +42,7 @@ export class Game {
         System.Process.app.timeWarp = 1;
         System.Process.app.timeOfDay = System.Process.app.hours * System.Process.app.timeWarp; 
 
-    ////reset screen state
-
-        System.Process.app.game.fightBoss = false;
-        System.Process.app.game.cutScene = false;
-
         System.Process.app.text['textType'] = 'dialog';  
-
-    ////shaders 
-
-      //  System.Process.app.shaders.init(scene);
-
-    ////events 
-
-       // System.Process.app.events.scene = scene;
-    
-    // //// map
-
-    //     System.Process.app.maps.init(scene);
-
-    // //// inventory
-        
-    //     System.Process.app.inventory.init(scene); 
-
-    // ////cheats ?
-
-    //     System.Process.app.cheats.applyAny(scene);
-
-    // //spawn player / enemies / pickups
-
-    //     System.Process.app.spawner.init(scene, playerArgs, spawnEnemies, spawnPickups);
-    
-    //collisions
-
-    //     System.Process.app.physics.collisions.init(scene);
-
-    // //camera fade in / set bounds / commonly used particles
-
-    //     if (System.Process.app.maps.map !== null)
-    //     {
-    //         System.Process.app.cam.init(scene); 
-    //         System.Process.app.particles.setCommon(scene);
-
-    // //bullet cut off zones
-
-    //         System.Process.app.zoneFront = scene.add.zone(0, 0, 50, 1500); 
-    //         System.Process.app.zoneBack = scene.add.zone(0, 0, 50, 1500); 
-
-    //         System.Process.app.game.groups.bulletZones.add(System.Process.app.zoneFront); 
-    //         System.Process.app.game.groups.bulletZones.add(System.Process.app.zoneBack); 
-    //     }
 
     //play music 
 

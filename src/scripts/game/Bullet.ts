@@ -8,6 +8,7 @@ export class Bullet extends ENABLE3D.ExtendedObject3D {
 
     private src: PlayerItem
     private damage: number
+    private gltf: typeof System.Process.utils.GLTF
 
     constructor(src: PlayerItem, damage: number, key: string)
     {
@@ -24,6 +25,8 @@ export class Bullet extends ENABLE3D.ExtendedObject3D {
         this.add(gltf.scene); 
 
         this.src.scene.third.add.existing(this); 
+
+        this.gltf = gltf;
 
         let isZoomed = this.src.controls.zoom ? true : false;
         
@@ -89,7 +92,7 @@ export class Bullet extends ENABLE3D.ExtendedObject3D {
         
             System.Process.app.ThirdDimension.Inventory3D.decrement(this.src.scene, 'ammo', this.src.name);
         
-            if (this.src.controls.type === 'third') //stop muzzle flash / shell casing if in third person
+            if (this.src.controls.perspectiveControls.type === 'third') //stop muzzle flash / shell casing if in third person
               return;
           
                 //exec muzzle flash particles
@@ -104,33 +107,33 @@ export class Bullet extends ENABLE3D.ExtendedObject3D {
                      // new MuzzleFlash(this.src.scene, i, player.position.x, player.position.y, player.position.z);    
                     }
                   });
-          
-                //shell casing
-          
-                  this.src.scene.time.delayedCall(500, ()=> {
-          
-                    const shellCasing = new ENABLE3D.ExtendedObject3D;
-                    shellCasing.name = 'bullet_3d';
-                    shellCasing.add(gltf.scene);
-                    shellCasing.scale.set(0.75, 0.75, 0.75);
-                    shellCasing.position.copy(this.src.position);
-                    this.src.scene.third.add.existing(shellCasing);
-                    this.src.scene.third.physics.add.existing(shellCasing, {
-                      shape: 'sphere', 
-                      radius: 0.1, 
-                      mass: 1200,
-                      collisionFlags: 4
-                    });
-          
-                    if (firePos)
-                      shellCasing.body.applyForce(Math.sin(500 * 0.035) * 0.055, 20, 0);
-                    
-                    shellCasing.body.on.collision((otherObject, event) => {
-          
-                      if (otherObject.name === 'level' && shellCasing.hasBody)
-                        this.src.scene.third.destroy(shellCasing);
+                
+              //create shell casing
+
+                this.src.scene.time.delayedCall(500, ()=> {
+
+                  const shellCasing = new ENABLE3D.ExtendedObject3D;
+                  shellCasing.name = 'bullet_3d';
+                  shellCasing.add(this.gltf.scene);
+                  shellCasing.scale.set(0.75, 0.75, 0.75);
+                  shellCasing.position.copy(this.src.position);
+                  this.src.scene.third.add.existing(shellCasing);
+                  this.src.scene.third.physics.add.existing(shellCasing, {
+                    shape: 'sphere', 
+                    radius: 0.1, 
+                    mass: 1200,
+                    collisionFlags: 4
                   });
+
+                  shellCasing.body.applyForce(Math.sin(500 * 0.035) * 0.055, 20, 0);
+                  
+                  shellCasing.body.on.collision((otherObject, event) => {
+
+                    if (otherObject.name === 'level' && shellCasing.hasBody)
+                      this.src.scene.third.destroy(shellCasing);
                 });
+              });
+
               }
             });     
         });
@@ -145,4 +148,7 @@ export class Bullet extends ENABLE3D.ExtendedObject3D {
       return object['objType'] === 'player' && object['playerID'] !== player.playerID ? true : false; 
     }
 
-  }
+
+
+
+}

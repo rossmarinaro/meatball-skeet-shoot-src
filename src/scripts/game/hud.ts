@@ -129,8 +129,7 @@ export class HUD3D {
                       if (this.textAValue)
                         this.textAValue.setText('0');
                         
-                      if (this.scene.gameOver)
-                        this.scene.gameOver();
+                      this.scene.gameOver();
                     }
 
                 break;

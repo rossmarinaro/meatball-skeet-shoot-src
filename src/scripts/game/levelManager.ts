@@ -17,9 +17,9 @@ export class LevelManager3D {
   {
     
     LevelManager3D.currentLevel = key;
-    LevelManager3D.level = new Actor(scene, LevelManager3D.currentLevel, true, true);
+    LevelManager3D.level = new Actor(scene, LevelManager3D.currentLevel);
 
-    await LevelManager3D.level.preload();
+    await LevelManager3D.level.preload(true);
     await LevelManager3D.setCollisions(scene);
 
     switch (LevelManager3D.currentLevel)

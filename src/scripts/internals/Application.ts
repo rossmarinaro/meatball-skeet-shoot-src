@@ -6,7 +6,10 @@ import { System } from './Config';
 import { Game } from '../game/game';
 import { AudioManager } from './Audio';
 import { AjaxManager } from './Ajax';
-import { Text } from './Text';
+import { Boot } from '../preload/Boot.js';
+import { Preload } from '../preload/Preload.js';
+import { Background } from '../preload/Background.js';
+import { Text, TextUI } from './Text';
 import { ThirdDimension } from './ThirdDimension';
 import { EventManager } from './Events';
 
@@ -79,7 +82,13 @@ export default class Application {
 
     //--------------------array of stages / minigames within the game
 
-        this.scene = Game.scene;
+        this.scene = [ 
+            new Boot,
+            new Preload, 
+            new Background,
+            new TextUI,
+            ...Game.scene 
+        ];
     }
 
 }
