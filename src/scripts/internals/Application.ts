@@ -28,7 +28,7 @@ export default class Application {
     public isPreloaded: types.isPreloaded
     public multiPlayer: types.multiPlayer
     public account: types.account
-
+    public timeOfDay: Readonly<number>
     
     private type: number
     private physics: any

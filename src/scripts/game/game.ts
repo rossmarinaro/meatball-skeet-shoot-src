@@ -36,11 +36,9 @@ export class Game {
 
     ////time of day
 
-        System.Process.app.date = new Date();
-        System.Process.app.hours = System.Process.app.date.getHours();
-
-        System.Process.app.timeWarp = 1;
-        System.Process.app.timeOfDay = System.Process.app.hours * System.Process.app.timeWarp; 
+        let date = new Date(),
+        hours = date.getHours();
+        System.Process.app.timeOfDay = hours;
 
         System.Process.app.text['textType'] = 'dialog';  
 

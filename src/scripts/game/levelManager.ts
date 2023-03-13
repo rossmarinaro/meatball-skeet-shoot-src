@@ -60,5 +60,26 @@ export class LevelManager3D {
     
   } 
 
+    //-------------------------------------------- make skybox
+
+
+    public static makeSkybox(scene: ENABLE3D.Scene3D, key: string): void
+    {
+  
+      const loader = new ENABLE3D.THREE.CubeTextureLoader(),
+            texture = loader.load([
+              key, 
+              key, 
+              key, 
+              key, 
+              key, 
+              key
+          ]);
+  
+      scene.third.heightMap.scene.background = texture;
+  
+    }
+  
+
    
 }

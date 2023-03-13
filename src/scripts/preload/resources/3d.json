@@ -6,11 +6,15 @@
         { "meatball_3d": "assets/meshes/meatbaddie.glb" },
         { "automac1000": "assets/meshes/automac1000.glb" },
         { "room": "assets/meshes/room.glb" },
+        { "carrot": "assets/meshes/carrot.glb" },
+        { "broccoli": "assets/meshes/broccoli.glb" },
         { "bullet_3d": "assets/meshes/macaroni.glb" },
         { "penne_3d": "assets/meshes/penne_3d.glb" },
         { "sv": "assets/meshes/sv.fbx" },
         { "glove_yellow": "assets/textures/glove_yellow.png" },
         { "bh_model": "assets/meshes/bh_model.fbx" },
-        { "bh_uv_red": "assets/textures/bh_uv_red.png" }
+        { "bh_uv_red": "assets/textures/bh_uv_red.png" },
+        { "island-heightmap": "assets/heightmaps/island.png" },
+        { "nori": "assets/textures/nori.jpg" }
     ]
 }
