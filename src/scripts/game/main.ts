@@ -58,10 +58,9 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
     //swanky velvet
 
-      this.swankyVelvet = new Actor(this, 'sv', true, true, ()=> {
+      this.swankyVelvet = new Actor(this, 'sv', 70, -18, -60, true, true, ()=> {
         
         this.swankyVelvet.anims.play('Idle');
-        this.swankyVelvet.position.set(70, -18, -60);
         this.swankyVelvet.rotation.set(0, -180, 0);
         this.swankyVelvet.scale.set(0.12, 0.12, 0.12);
  

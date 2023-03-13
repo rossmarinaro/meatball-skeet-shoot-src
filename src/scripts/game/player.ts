@@ -39,7 +39,7 @@ export class Player3D extends Actor {
 
     )
     {
-      super(scene, 'bh_model', true, false, () => {
+      super(scene, 'bh_model', 0, 0, 0, true, false, () => {
         
         this.isSelf = isSelf;
         this.data = data;
@@ -87,7 +87,7 @@ export class Player3D extends Actor {
 
               if (i.geometry.attributes.uv && i.name === 'body')
                 this.scene.third.load
-                .texture(`bh_uv_${this.color}`)
+                .texture(`bh_uv_red`)
                 .then(texture => {
 
                     i.material.map = texture;
@@ -445,7 +445,7 @@ export class Player3D extends Actor {
         this.itemProp.remove(this.itemProp.children[0]);
 
       this.currentEquipped.key = data.item.key;
-      this.itemProp = new Actor(this.scene, data.item.key, true, false, () => {
+      this.itemProp = new Actor(this.scene, data.item.key, 0, 0, 0, true, false, () => {
         this.itemProp?.traverse((i: any): void => {
           this.scene.third.add.existing(this.itemProp);
           System.Process.app.ThirdDimension.Inventory3D.setItemForThirdPerson(this.itemProp, i);

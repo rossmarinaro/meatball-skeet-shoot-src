@@ -6,6 +6,9 @@ import { System } from '../internals/Config'
 
 export class Actor extends ENABLE3D.ExtendedObject3D {
 
+    public x?: number
+    public y?: number
+    public z?: number
     public asset_id: string
     public key: string
     public obj: any
@@ -17,6 +20,9 @@ export class Actor extends ENABLE3D.ExtendedObject3D {
     constructor (
       scene: ENABLE3D.Scene3D, 
       key: string, 
+      x?: number,
+      y?: number,
+      z?: number,
       willLoad?: boolean, 
       willRender?: boolean, 
       callback?: Function 
@@ -27,6 +33,9 @@ export class Actor extends ENABLE3D.ExtendedObject3D {
 
       Actor.idIterator++;
 
+      this.x = x;
+      this.y = y;
+      this.z = z;
       this.scene = scene;
       this.callback = callback;
       this.key = key;
@@ -75,6 +84,9 @@ export class Actor extends ENABLE3D.ExtendedObject3D {
       if (render)
       {
         
+        if (this.x && this.y && this.z)
+          this.position.set(this.x, this.y, this.z);
+
         this.scene.third.add.existing(this);
 
         this.traverse((child: any) => {

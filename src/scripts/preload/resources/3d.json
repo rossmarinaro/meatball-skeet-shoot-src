@@ -2,7 +2,6 @@
 {
     "assets": [
 
-        { "meatball_mountains": "assets/meshes/meatball_mountain.glb" },
         { "meatball_3d": "assets/meshes/meatbaddie.glb" },
         { "automac1000": "assets/meshes/automac1000.glb" },
         { "room": "assets/meshes/room.glb" },

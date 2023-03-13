@@ -2,68 +2,56 @@ import * as ENABLE3D from '@enable3d/phaser-extension';
 
 import { Actor } from './Actor';
 
-//------------ MEATBALL
+//--------- MEATBALL
 
 
 export class Meatball extends Actor {
 
-    private x: number
-    private y: number
-    private z: number
-    
-    public static meatballs: Meatball[] = []
+  
+  public static meatballs: Meatball[] = []
 
-    constructor(scene: ENABLE3D.Scene3D, x: number, y: number, z: number)
-    {
+  constructor(scene: ENABLE3D.Scene3D, x: number, y: number, z: number)
+  {
 
-      super(scene, 'meatball_3d', true, true, ()=> {
+    super(scene, 'meatball_3d', x, y, z, true, true, ()=> this.scene.third.physics.add.existing(this, { shape: 'sphere', mass: 0.5, collisionFlags: 2, radius: 7, /*breakable: true, fractureImpulse: 5*/}));
 
-        this.position.set(this.x, this.y, this.z);
-        this.scene.third.physics.add.existing(this, { shape: 'sphere', mass: 0.5, collisionFlags: 2, radius: 7, /*breakable: true, fractureImpulse: 5*/});
+    //tween
 
-      });
+    let tmp = this.position.clone();
 
-      this.x = x;
-      this.y = y;
-      this.z = z;
+    scene.tweens.add({
+      targets: tmp, 
+      duration: 5000, 
+      stagger: scene.tweens.stagger(100, {}),
+      repeatDelay: Math.random() * 100, 
+      delay: Math.random() * 100, 
+      ease: 'Sine.easeInOut', 
+      y: tmp.y + Math.random() * 100, 
+      repeat: -1, 
+      yoyo: true,
+    onUpdate: ()=> {
+      this.position.setY(tmp.y);
+      if (this.body !== null && this.body !== undefined)
+        this.body.needUpdate = true; 
+    }});
 
-      //tween
+  }
 
-      let tmp = this.position.clone();
+//------------------------- spawn
 
-      scene.tweens.add({
-        targets: tmp, 
-        duration: 5000, 
-        stagger: scene.tweens.stagger(100, {}),
-        repeatDelay: Math.random() * 100, 
-        delay: Math.random() * 100, 
-        ease: 'Sine.easeInOut', 
-        y: tmp.y + Math.random() * 100, 
-        repeat: -1, 
-        yoyo: true,
-      onUpdate: ()=> {
-        this.position.setY(tmp.y);
-        if (this.body !== null && this.body !== undefined)
-          this.body.needUpdate = true; 
-      }});
+  public static spawn(scene: ENABLE3D.Scene3D, spawns: number): void
+  {
 
-    }
+      for (let i = 0; i < spawns; i++)
+      {
 
-  //------------------------- spawn
+        let x = Phaser.Math.Between(-100, 100),
+            y = Phaser.Math.Between(30, 70),
+            z = Phaser.Math.Between(-200, -220);
 
-    public static spawn(scene: ENABLE3D.Scene3D, spawns: number): void
-    {
+        Meatball.meatballs.push(new Meatball(scene, x, y, z)); 
 
-        for (let i = 0; i < spawns; i++)
-        {
+      }
 
-          let x = Phaser.Math.Between(-100, 100),
-              y = Phaser.Math.Between(30, 70),
-              z = Phaser.Math.Between(-200, -220);
-
-          Meatball.meatballs.push(new Meatball(scene, x, y, z)); 
-
-        }
-
-    }
+  }
 }

@@ -1,5 +1,7 @@
 import * as ENABLE3D from '@enable3d/phaser-extension';
 import { System } from '../../internals/Config';
+import { Actor } from '../Actor';
+import { LevelManager3D } from '../levelManager';
 import chroma from 'chroma-js';
 
 export async function Room (scene: ENABLE3D.Scene3D): Promise<Readonly<void>>
@@ -60,20 +62,20 @@ export async function Room (scene: ENABLE3D.Scene3D): Promise<Readonly<void>>
     //trees
 
     const trees = [
-        new System.Process.app.ThirdDimension.Actor(scene, 'broccoli', 200, -100, -300, true, true),
-        new System.Process.app.ThirdDimension.Actor(scene, 'broccoli', 300, -100, -180, true, true),
-        new System.Process.app.ThirdDimension.Actor(scene, 'broccoli', -210, -100, 120, true, true)
+        new Actor(scene, 'broccoli', 200, -100, -300, true, true),
+        new Actor(scene, 'broccoli', 300, -100, -180, true, true),
+        new Actor(scene, 'broccoli', -210, -100, 120, true, true)
     ],
 
     trees2 = [
-        new System.Process.app.ThirdDimension.Actor(scene, 'carrot', -400, -100, -140, true, true),
-        new System.Process.app.ThirdDimension.Actor(scene, 'carrot', -300, -100, -500, true, true),
-        new System.Process.app.ThirdDimension.Actor(scene, 'carrot', 100, -100, -570, true, true),
-        new System.Process.app.ThirdDimension.Actor(scene, 'carrot', 400, -100, 450, true, true)
+        new Actor(scene, 'carrot', -400, -100, -140, true, true),
+        new Actor(scene, 'carrot', -300, -100, -500, true, true),
+        new Actor(scene, 'carrot', 100, -100, -570, true, true),
+        new Actor(scene, 'carrot', 400, -100, 450, true, true)
     ];
 
     trees.forEach(i => i.scale.set(5, 5, 5));
     trees2.forEach(i => i.scale.set(17, 17, 17));
 
-    System.Process.app.ThirdDimension.LevelManager3D.makeSkybox(scene, System.Process.app.timeOfDay >= 17 ? 'assets/backgrounds/pixel3.png' : 'assets/backgrounds/pixel2.png');
+    LevelManager3D.makeSkybox(scene, System.Process.app.timeOfDay >= 17 ? 'assets/backgrounds/pixel3.png' : 'assets/backgrounds/pixel2.png');
 }

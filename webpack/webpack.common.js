@@ -83,7 +83,7 @@ module.exports = {
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true)
     }),
-    new HtmlWebpackPlugin({ gameName: 'Pastaboss: A Recipe For Disaster', template: 'src/index.html', inject: 'body' }),
+    new HtmlWebpackPlugin({ gameName: 'Pastaboss: Meatball Skeetshoot', template: 'src/index.html', inject: 'body' }),
     new CopyWebpackPlugin([
       { from: 'src/assets', to: 'assets' },
       { from: 'pwa', to: '' }
