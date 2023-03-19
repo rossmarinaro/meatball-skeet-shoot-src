@@ -21,6 +21,7 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
   private _scene: Phaser.Scene
   private swankyVelvet: ENABLE3D.ExtendedObject3D
+  private meatballs: Meatball[] = []
 
   constructor() {
     super({ key: 'SkeetShoot' });
@@ -38,7 +39,7 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
    System.Process.app.ThirdDimension.init(this, 10, 10, -10);  
    System.Process.app.ThirdDimension.Inventory3D.ammo.automac1000 = Infinity;
-   Meatball.meatballs = [];
+   this.meatballs = [];
 
   }
   private async preload(): Promise<void>
@@ -54,7 +55,7 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
     //spawn meatball targets
 
-      Meatball.spawn(this, 10);
+    this.spawnMeatballs(10);
 
     //swanky velvet
 
@@ -73,6 +74,20 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
   {
     if (this.score >= 10)
       this.timeLeft = 0; //you win
+  }
+
+  private spawnMeatballs (spawns: number): void
+  {
+    for (let i = 0; i < spawns; i++)
+    {
+
+      let x = Phaser.Math.Between(-200, 200),
+          y = Phaser.Math.Between(30, 120),
+          z = Phaser.Math.Between(-300, -500);
+
+      this.meatballs.push(new Meatball(this, x, y, z)); 
+
+    }
   }
 
 

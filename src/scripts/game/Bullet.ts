@@ -17,6 +17,7 @@ export class Bullet extends ENABLE3D.ExtendedObject3D {
 
       this.src = src;
       this.damage = damage;
+      this.userData['damage'] = damage;
 
       src.scene.third.load
       .gltf(key)

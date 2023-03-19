@@ -8,8 +8,6 @@ import { Actor } from './Actor';
 export class Meatball extends Actor {
 
 
-  public static meatballs: Meatball[] = []
-
   constructor(scene: ENABLE3D.Scene3D, x: number, y: number, z: number)
   {
 
@@ -75,21 +73,5 @@ export class Meatball extends Actor {
 
   }
 
-//------------------------- spawn
 
-  public static spawn(scene: ENABLE3D.Scene3D, spawns: number): void
-  {
-
-      for (let i = 0; i < spawns; i++)
-      {
-
-        let x = Phaser.Math.Between(-100, 100),
-            y = Phaser.Math.Between(30, 70),
-            z = Phaser.Math.Between(-200, -220);
-
-        Meatball.meatballs.push(new Meatball(scene, x, y, z)); 
-
-      }
-
-  }
 }
