@@ -62,21 +62,9 @@ export class Bullet extends ENABLE3D.ExtendedObject3D {
   
             if (this.hasBody)
               this.src.scene.third.destroy(this);
-
-              if (otherObject['key'] === 'meatball_3d') //meatball mini game score tally increases here
-              {
-        
-                this.src.scene['score']++;
-        
-                if (otherObject.hasBody) 
-                {
-                  this.src.scene.third.destroy(otherObject);
-                  System.Process.app.audio.play('fire_fx', 6, false, this.src.scene, 0);
-                }
-              }
   
-              if (await Bullet.checkAttackSource(this.src.player, otherObject))
-                System.Process.app.events.socketEmit('DEATHMATCH: player damage', { attacker: this.src.source, user: otherObject['playerID'], damage: this.damage}); 
+            if (await Bullet.checkAttackSource(this.src.player, otherObject))
+              System.Process.app.events.socketEmit('DEATHMATCH: player damage', { attacker: this.src.source, user: otherObject['playerID'], damage: this.damage}); 
               
           });
 

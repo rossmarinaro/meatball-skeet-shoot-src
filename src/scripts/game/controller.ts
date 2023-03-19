@@ -324,15 +324,7 @@ export class Controller3D {
         this.perspectiveControls.current = camera;
     }
 
-  //-------------------------------- trigger movement
 
-    private triggerMovement (x: number, y: number): void
-    {
-
-      this.player.move(x, y);
-      this.perspectiveControls.update(this.pointerMoveX / 5, this.pointerMoveY / 5); 
-
-    }
   
   //---------------------------------------- zoom
 
@@ -408,16 +400,16 @@ export class Controller3D {
         //forward / back
 
           if (this.keys.w.isDown)
-            this.triggerMovement(0, -41);
+            this.player.move(0, -41);
           else if (this.keys.s.isDown)
-            this.triggerMovement(0, 41);  
+            this.player.move(0, 41);  
 
         //strafe
 
           else if (this.keys.a.isDown)
-            this.triggerMovement(-41, 0);
+            this.player.move(-41, 0);
           else if (this.keys.d.isDown)
-            this.triggerMovement(41, 0);
+            this.player.move(41, 0);
         }
 
     }
