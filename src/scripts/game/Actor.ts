@@ -59,7 +59,7 @@ export class Actor extends ENABLE3D.ExtendedObject3D {
 
         await this.scene.third.load.gltf(this.key).then(async (obj: typeof System.Process.utils.GLTF) => {
           this.morphTargetInfluences = obj['morphTargetInfluences'];
-          this.obj = obj.scene; 
+          this.obj = obj; 
           this.add(obj.scene); 
         }) :
         await this.scene.third.load.fbx(this.key).then(async (obj: any) => {

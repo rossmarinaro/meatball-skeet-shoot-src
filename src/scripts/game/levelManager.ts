@@ -39,7 +39,7 @@ export class LevelManager3D {
 
     return new Promise(res => {
       
-      const obj = LevelManager3D.level.obj.children; 
+      const obj = LevelManager3D.level.obj.scene.children; 
 
       if (obj)
       {
