@@ -17,12 +17,15 @@ export class Preload extends Phaser.Scene {
         this.progressOverlay = {};
         this.loadIterator = {};
 
-        this.preload3D = async (scene, scene3d) =>{
-            scene.scene.launch('Background', 'blank');
-            await parseResources(scene3d, scene.cache.json.get('resources_3d'));
-            setTimeout(()=> scene.scene.stop('Background'), 1000);
-        }
+    
 	}
+
+    async preload3D (scene, scene3d) 
+    {
+        scene.scene.launch('Background', 'blank');
+        await parseResources(scene3d, scene.cache.json.get('resources_3d'));
+        setTimeout(()=> scene.scene.stop('Background'), 1000);
+    }
 
 
 //----------------------------------------------------------------------------------------------------------------
@@ -44,7 +47,7 @@ export class Preload extends Phaser.Scene {
     //---- call asset preload funcs
 
        parseResources(this, this.cache.json.get('resources_main')); 
-       
+       parseResources(this, this.cache.json.get('resources_3d'));
 
 	//---- progress bar   
 
