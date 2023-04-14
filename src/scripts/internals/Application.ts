@@ -6,6 +6,7 @@ import { System } from './Config';
 import { Game } from '../game/game';
 import { AudioManager } from './Audio';
 import { AjaxManager } from './Ajax';
+import { ShaderManager } from '../shaders/main';
 import { Boot } from '../preload/Boot.js';
 import { Preload } from '../preload/Preload.js';
 import { Background } from '../preload/Background.js';
@@ -20,6 +21,7 @@ export default class Application {
     public ajax: typeof AjaxManager = AjaxManager
     public audio: typeof AudioManager = AudioManager
     public events: typeof EventManager = EventManager
+    public shaders: typeof ShaderManager = ShaderManager
     public text: typeof Text = Text
     public ThirdDimension: typeof ThirdDimension = ThirdDimension
     public scale: any

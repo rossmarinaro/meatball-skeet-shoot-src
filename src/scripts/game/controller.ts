@@ -73,7 +73,7 @@ export class Controller3D {
   
       this.perspectiveControls = {
 
-        type: 'third',
+        type: 'first',
         current: null,
         camera: {
           first: new ENABLE3D.FirstPersonControls(this.scene.third.camera, this.player, {targetRadius: 0}),

@@ -6,6 +6,7 @@
         { "huh": "assets/audio/sounds/huh.ogg" },
         { "pistol_shot": "assets/audio/sounds/pistol_shot.ogg" },
         { "phryg1": "assets/audio/music/phrygian1.ogg" },
+        { "slap": "assets/audio/music/slap.ogg" },
         { "al_electro": "assets/audio/music/al_electro.ogg" },
         { "airhorn": "assets/audio/sounds/airhorn.ogg" },
         { "automac1000_shot": "assets/audio/sounds/automac1000.ogg" },

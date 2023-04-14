@@ -159,7 +159,9 @@ export class Player3D extends Actor {
                         if (this.itemProp !== null)
                         {
                           this.itemProp.position.copy(pos);
-                          this.itemProp.rotation.y = this.obj.rotation.y//* 0.25;
+
+                          if (this.hasBody)
+                            this.itemProp.rotation.y = this.rotation.y + 180
                         }
 
                         i.attach(itemOrigin);
@@ -522,24 +524,12 @@ export class Player3D extends Actor {
           this.position.copy(this.rigidBody.position);
 
         this.rigidBody.body.needUpdate = true;
-        this.rigidBody.body.on.collision((otherObject, event) => {
+       
+        this.rigidBody.body.on.collision(otherObject => {
 
-        if (event !== 'end')
-          this.collide = true;
-        else 
-        {
-          this.collide = false;
-          //this.onRamp = false;
-        } 
-        // otherObject.traverse((i: any) => {
-        //   if (i.name === 'ramp')
-        //   {
-        //     this.onRamp = true;
-        //     this.rigidBody.body.setVelocityY(0);
-        //   }
-        // });
-
-        }); 
+          if (!otherObject.name.includes('bh_model'))
+            this.canJump = true; 
+        });  
 
         
         if (this.collide && this.body.velocity.y <= 0)

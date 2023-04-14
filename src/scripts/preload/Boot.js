@@ -61,8 +61,6 @@ export class Boot extends Phaser.Scene {
                 
                this.scene.run('Preload', this.data);
 
-                this.scene.stop('Boot');
-
             });
         }
     }

@@ -63,14 +63,36 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
             this.scene.third.add.existing(this);
           });
 
-        if (child.name === 'muzzle') 
+        //iterate over muzzleflash meshes
+
+        if (child.name.includes('muzzle')) 
         {
-          //console.log(child)//child.material.map = new Shaders
-          child.opacity = 0.3;
-          child.visible = false;
+
+          const fireTexture = new ENABLE3D.THREE.TextureLoader().load('assets/textures/fire.png');
+
+          fireTexture.wrapS = fireTexture.wrapT = ENABLE3D.THREE.RepeatWrapping;
+
+          child.visible = false; 
+
+          child.material = System.Process.app.shaders.createShaderMaterial(
+            'pnoise_Vert', 
+            'muzzleFlash_Frag', 
+            {
+              blending: 'AdditiveBlending',
+              depthTest: true, 
+              transparent: true,
+              uniforms: {
+                  alpha: { value: Math.random() * 1 },
+                  tExplosion: { type: 't', value: fireTexture },
+                  time: { type: 'f', value: 0.0 },
+                  resolution: { value: new ENABLE3D.THREE.Vector2(innerWidth, innerHeight)}
+              }
+            }
+          );
+
         }
 
-        if (child.isMesh) 
+        else if (child.isMesh) 
         {
           child.castShadow = child.receiveShadow = true;
           if (child.material) 
@@ -107,112 +129,51 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
   public async fire(): Promise<void> 
   {
 
-    switch (this.name) 
+    if (System.Process.app.ThirdDimension.Inventory3D.ammo.automac1000 <= 0) 
     {
-
-      case 'rolling_pin1':
-
-        if (!this.canAttack)
-          return;
-
-        this.canAttack = false;
-
-        this.anims.play('attack');
-
-        this.scene.time.delayedCall(800, () => {
-
-          System.Process.app.audio.play('sword_swipe', 0.5, false, this.scene, 0);
-
-          if (!this.player.raycaster)
-            return;
-
-
-          const firePos = {
-            x: this.player.position.x,
-            y: this.player.position.y,
-            z: this.player.position.z
-          }
-
-          if (firePos) {
-            let hitPoint = this.scene.third.physics.add.sphere(
-              {
-                radius: 3,
-                mass: 1,
-                x: firePos.x,
-                y: firePos.y,
-                z: firePos.z
-              },
-              {
-                phong: { color: 0xccc, visible: false }
-              });
-
-            hitPoint.rotation.copy(this.scene['controller'].perspectiveControls.current.target.rotation);
-            hitPoint.body.setCcdMotionThreshold(1);
-            hitPoint.body.setCcdSweptSphereRadius(0.2);
-
-            //System.Process.app.events.socketEmit('DEATHMATCH: player attack', { source: this.source, damage: 0.1});
-
-            hitPoint.body.on.collision(async otherObject => {
-
-              if (await this.bullet.checkAttackSource(this.player, otherObject)) 
-              {
-                System.Process.app.events.socketEmit('DEATHMATCH: player damage', { attacker: this.source, user: otherObject['playerID'], damage: 1 });
-                //this.destroyHitPoint(hitPoint);
-              }
-            });
-
-            this.scene.time.delayedCall(400, () => this.destroyHitPoint(hitPoint));
-          }
-
-        });
-
-        break;
-
-      case 'penne_pistol':
-
-        if (!this.canAttack)
-          return;
-
-        this.canAttack = false;
-
-        this.scene.time.delayedCall(400, () => {
-
-          this.anims.mixer.stopAllAction();
-          this.canAttack = true;
-        });
-
-        if (System.Process.app.ThirdDimension.Inventory3D.ammo.penne_pistol <= 0)
-        {
-          System.Process.app.audio.play('sword_swipe', 0.5, false, this.scene, 0);
-          return;
-        }
-
-        System.Process.app.audio.play('pistol_shot', 0.5, false, this.scene, 0);
-        System.Process.app.audio.play('penne_pistol_shot', 2, false, this.scene, 0);
-
-        this.anims.play('attack');
-
-        new this.bullet(this, 2, 'penne_3d');
-
-
-        break;
-
-      case 'automac1000':
-
-        if (System.Process.app.ThirdDimension.Inventory3D.ammo.automac1000 <= 0) 
-        {
-          System.Process.app.audio.play('sword_swipe', 0.5, false, this.scene, 0);
-          return;
-        }
-
-        System.Process.app.audio.play('automac1000_shot', 2, false, this.scene, 0);
-        System.Process.app.audio.play('pistol_shot', 0.5, false, this.scene, 0);
-
-
-        new this.bullet(this, 3, 'bullet_3d');
-
-        break;
+      System.Process.app.audio.play('sword_swipe', 0.5, false, this.scene, 0);
+      return;
     }
+
+    System.Process.app.audio.play('automac1000_shot', 2, false, this.scene, 0);
+    System.Process.app.audio.play('pistol_shot', 0.5, false, this.scene, 0);
+
+    System.Process.app.shaders.setSelectiveBloom(20, 'muzzle');
+
+    new this.bullet(this, 3, 'bullet_3d', 4, 1000, true);
+
+    this.traverse(async (i: any) => { 
+      
+      //muzzle particle positioning and uniform updates
+        
+      if (i.name.includes('muzzle'))
+      {
+ 
+        i.visible = true;
+
+        i.rotation.x += Math.random() * 1000;
+        i.rotation.y += Math.random() * 1000;
+        i.rotation.z += Math.random() * 1000;
+
+        i.scale.set(Math.random() * 0.07, Math.random() * 0.1, Math.random() * 0.15);
+
+        i.material.uniforms.alpha.value = Math.random() * 1;
+        
+        i.material.uniforms.time.value += 0.01;
+
+        this.scene.time.delayedCall(200, () => {
+
+          i.visible = false;
+
+          if(this.player.health > 1 || Number.isNaN(this.player.health))
+            System.Process.app.shaders.postProcessing = false;
+          
+          System.Process.app.shaders.objectSelection = null;
+          
+        });
+
+      }
+    });
 
   }
 
@@ -236,20 +197,6 @@ export class PlayerItem extends ENABLE3D.ExtendedObject3D {
       this.player.movement.y = Math.sin(time * 0.035) * 0.055;
       this.player.movement.z = Math.sin(time * 0.035) * 0.055;
     }
-  }
-
-
-  //------------------------------------------------------ destroy hit point
-
-
-  private destroyHitPoint(hitPoint?: ENABLE3D.ExtendedObject3D): void 
-  {
-
-    if (hitPoint && hitPoint.hasBody)
-      this.scene.third.destroy(hitPoint);
-
-    this.canAttack = true;
-    this.anims.mixer.stopAllAction();
   }
 
 

@@ -23,16 +23,35 @@ export class Inventory3D {
         dynamite: 0 
     }
 
-//------------------------------------------------ reset ammo
+//------------------------------------------------ reset inventory to defaults
 
-    public static resetAmmo (base: number): void
+    public static reset(base: number): void
     {
+
+        Inventory3D.currentSelection = '';
+        Inventory3D.currentInventory = [];
+        
         Inventory3D.ammo = {
             automac1000: base,
             penne_pistol: base,
             rigatoni_rocket_launcher: base,
             grenade: base,
             dynamite: base
+        }
+    }
+
+
+    //------------------------------------------------ ammo
+
+
+    public static makeUnlimitedAmmo (): void
+    {
+        Inventory3D.ammo = {
+            automac1000: Infinity,
+            penne_pistol: Infinity,
+            rigatoni_rocket_launcher: Infinity,
+            grenade: Infinity,
+            dynamite: Infinity
         }
     }
 
