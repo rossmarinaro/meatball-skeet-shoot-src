@@ -98,16 +98,17 @@ export async function parseResources(scene: Phaser.Scene, json: JSON)
        
     ////------------------------------3d only
        
-    if (!scene['third'])
-       return;
+    if (scene['third'])
 
-    for (let key in json['assets']) 
-        {
-            let keys: any = Object.keys(json['assets'][key]).find(i => i);  
-            for (let value in json['assets'][key]) 
+        for (let key in json['assets']) 
             {
-                let values = json['assets'][key][value];  
-                scene['third'].load.preload(keys, values); 
+                let keys: any = Object.keys(json['assets'][key]).find(i => i);  
+                for (let value in json['assets'][key]) 
+                {
+                    let values = json['assets'][key][value];  
+                    scene['third'].load.preload(keys, values); 
+                }
             }
-        }
+
+    return json;
 }

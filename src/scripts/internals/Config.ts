@@ -2,7 +2,7 @@ import * as ENABLE3D  from '@enable3d/phaser-extension';
 
 import { orientation } from '../../../typings/types';
 import { Canvas }  from '@enable3d/phaser-extension';
-
+import Utils from '../internals/Utils';
 
 //--------------------------------------- base sys namespace
 
@@ -11,6 +11,7 @@ export namespace System {
     export class Config {
 
         private Canvas: Readonly<typeof Canvas>
+        public static utils: typeof Utils = Utils
 
         public game: Readonly<Phaser.Game>
         public app: any

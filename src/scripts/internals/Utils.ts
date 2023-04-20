@@ -1,18 +1,60 @@
 /* COMMON UTILS */
 
 import * as ENABLE3D from '@enable3d/phaser-extension';
-import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { System } from './Config';
 
 export default class Utils {
 
-    public static GLTF: GLTF
-
+    
     public static numbers = {
-        multiplyDecimals: (valA: number, valB: number) => { return (valA * 10 + valB * 10) }
+
+        multiplyDecimals: function (a: number, b: number): number
+        { 
+            return (a * 10 + b * 10);
+        },
+        inRange: function(x: number, a: number, b: number): boolean
+        { 
+            return x >= a && x <= b; 
+        },
+        clamp: function (x: number, a: number, b: number): number 
+        {
+            return Math.min(Math.max(x, a), b);
+        },
+        lerp: function (x: number, a: number, b: number): number
+        {
+            return x * (b - a) + a;
+        }
+        
     }
 
     public static strings = {
+
+        
+        getFileType: function (path: string): string
+        {      
+            return String(path.split('.').pop());
+        },
+
+        getFilePathByKey: async function (key: string, manifest: string, type: string): Promise<string> 
+        {
+            return new Promise(res => {   
+
+                let i = 0;
+
+                const cache = System.Process.game.scene.getScene('Boot').cache.json.get(manifest)[type];
+
+                cache.filter(async (resource: Object) => {
+
+                    i++;
+                    
+                    if (String(Object.keys(resource)[0]) === key)
+                        res(String(Object.values(resource)[0]));
+                        
+                    else if (i >= cache.length) 
+                        res("No asset found.");
+                });
+            })
+        },
 
         joinWithUnderscore: function (a: string, b: string): string
         {
@@ -43,8 +85,8 @@ export default class Utils {
 
         removeNumbers: async function(str: string): Promise<string>
         {      
-            let strArr: string[] = [],
-                numArr: string[] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            const strArr: string[] = [],
+                  numArr: string[] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
             for(let char = 0; char < str.length; char++)
                 strArr.push(str[char]); 
@@ -94,27 +136,14 @@ export default class Utils {
         }
     }
         
-    //------------------------------------------ get file type
-
-    public static async getFileType(scene: ENABLE3D.Scene3D, key: string): Promise<Readonly<string>>
-    {
-        const cache = scene.cache.json.get('resources_3d'),
-                obj = cache.assets.filter((asset: any) => Object.keys(asset).toString() === key),
-                file: Object = Object.entries(obj[0]),
-                extension = file[0][1].endsWith('glb') ? 'glb' : 'fbx';
-
-        return extension;
-    }
-
     
-
-    //------------------------------------ get nearest bone
+    //------------------------------------ find nearest 3d mesh
 
 
     public static async getNearestBone(
 
-        meshA: typeof System.Process.app.sys3d.actor, 
-        meshB: typeof System.Process.app.sys3d.actor, 
+        meshA: ENABLE3D.ExtendedMesh, 
+        meshB: ENABLE3D.ExtendedMesh, 
         key: string
 
     ): Promise<Readonly<{bone: Object, pos: number}> | null>
@@ -122,8 +151,8 @@ export default class Utils {
 
         const 
 
-           bonesA = meshA.obj?.children.filter((i: ENABLE3D.THREE.Object3D) => i instanceof ENABLE3D.THREE.Bone),
-           bonesB = meshB.obj?.children.filter((i: ENABLE3D.THREE.Object3D) => i instanceof ENABLE3D.THREE.Bone),
+           bonesA = meshA?.children.filter((i: ENABLE3D.THREE.Object3D) => i instanceof ENABLE3D.THREE.Bone),
+           bonesB = meshB?.children.filter((i: ENABLE3D.THREE.Object3D) => i instanceof ENABLE3D.THREE.Bone),
            bones: any[] = [];
            
         if (bonesA && bonesB)
@@ -155,30 +184,49 @@ export default class Utils {
 
     public static getDotProduct(
 
-        actorA: typeof System.Process.app.sys3d.player | typeof System.Process.app.sys3d.actor, 
-        actorB: typeof System.Process.app.sys3d.player | typeof System.Process.app.sys3d.actor
+        actorA: ENABLE3D.ExtendedMesh, 
+        actorB: ENABLE3D.ExtendedMesh
         
     ): Readonly<number>
     {
  
-        let posA = actorA.position,
-            posB = actorB.position,
-            vecA = new ENABLE3D.THREE.Vector3(posA.x, posA.y, posA.z),
-            vecB = new ENABLE3D.THREE.Vector3(posB.x, posB.y, posB.z), 
+        const posA = actorA.position,
+              posB = actorB.position,
+              vecA = new ENABLE3D.THREE.Vector3(posA.x, posA.y, posA.z),
+              vecB = new ENABLE3D.THREE.Vector3(posB.x, posB.y, posB.z), 
 
-            vecA_length = Math.sqrt(vecA.x * vecA.x + vecA.y * vecA.y + vecA.z * vecA.z), 
-            vecB_length = Math.sqrt(vecB.x * vecB.x + vecB.y * vecB.y + vecB.z * vecB.z), 
+              vecA_length = Math.sqrt(vecA.x * vecA.x + vecA.y * vecA.y + vecA.z * vecA.z), 
+              vecB_length = Math.sqrt(vecB.x * vecB.x + vecB.y * vecB.y + vecB.z * vecB.z), 
         
-            inverse_length_vecA = 1 / vecA_length, 
-            inverse_length_vecB = 1 / vecB_length, 
+              inverse_length_vecA = 1 / vecA_length, 
+              inverse_length_vecB = 1 / vecB_length, 
         
-            unit_vecA = new ENABLE3D.THREE.Vector3(vecA.x * inverse_length_vecA, vecA.y * inverse_length_vecA, vecA.z * inverse_length_vecA), 
-            unit_vecB = new ENABLE3D.THREE.Vector3(vecB.x * inverse_length_vecB, vecB.y * inverse_length_vecB, vecB.z * inverse_length_vecB), 
+              unit_vecA = new ENABLE3D.THREE.Vector3(vecA.x * inverse_length_vecA, vecA.y * inverse_length_vecA, vecA.z * inverse_length_vecA), 
+              unit_vecB = new ENABLE3D.THREE.Vector3(vecB.x * inverse_length_vecB, vecB.y * inverse_length_vecB, vecB.z * inverse_length_vecB), 
         
-            dotProduct = (unit_vecA.x * unit_vecB.x) + (unit_vecA.y * unit_vecB.y) + (unit_vecA.z * unit_vecB.z);
+              dotProduct = (unit_vecA.x * unit_vecB.x) + (unit_vecA.y * unit_vecB.y) + (unit_vecA.z * unit_vecB.z);
 
         return dotProduct;
 
+    }
+
+    //------------------------------------------------
+
+    public static getCrossProduct(
+
+        actorA: ENABLE3D.ExtendedMesh, 
+        actorB: ENABLE3D.ExtendedMesh
+        
+    ): Readonly<ENABLE3D.THREE.Vector3>
+    {
+        const posA = actorA.position,
+              posB = actorB.position;
+
+        return new ENABLE3D.THREE.Vector3(
+                posA.y * posB.z - posA.z * posB.y, 
+                posA.z * posB.x - posA.x * posB.z, 
+                posA.x * posB.y - posA.y * posB.x
+            ); 
     }
     
 }

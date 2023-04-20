@@ -1,6 +1,7 @@
 
 
 import { parseResources } from '../internals/parser';
+import { THREE } from '@enable3d/phaser-extension';
 
 export class Preload extends Phaser.Scene {
 	constructor() {
@@ -15,17 +16,10 @@ export class Preload extends Phaser.Scene {
         this.progressBox = {}; 
         this.progressBox2 = {};
         this.progressOverlay = {};
-        this.loadIterator = {};
+        this.loadIterator = {}; 
 
     
 	}
-
-    async preload3D (scene, scene3d) 
-    {
-        scene.scene.launch('Background', 'blank');
-        await parseResources(scene3d, scene.cache.json.get('resources_3d'));
-        setTimeout(()=> scene.scene.stop('Background'), 1000);
-    }
 
 
 //----------------------------------------------------------------------------------------------------------------
@@ -40,14 +34,13 @@ export class Preload extends Phaser.Scene {
 
 //----------------------------------------------------------------------------------------------------------------
 
-	preload()
+	async preload()
     {   
 
 
     //---- call asset preload funcs
 
-       parseResources(this, this.cache.json.get('resources_main')); 
-       parseResources(this, this.cache.json.get('resources_3d'));
+       await parseResources(this, this.cache.json.get('resources_main')); 
 
 	//---- progress bar   
 
@@ -144,10 +137,53 @@ export class Preload extends Phaser.Scene {
         this.assetText.destroy();
 
         this.scene.run('SkeetShoot', [this, 1]);
+        this.scene.stop('Preload');
+       
     }
 
     
-//-----------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------- 3d
+
+
+    async load3DAssets (scene, scene3d) 
+    {
+
+        THREE.Cache.enabled = true;
+
+        return new Promise(async res => {
+
+            scene.scene.get('HUD3D')['alert']('large', 'Loading assets...', 'please wait');
+
+            let numAssets = 0;
+
+            const resources = await parseResources(scene3d, scene.cache.json.get('resources_3d'));
+
+            resources['assets'].map(async (resource) => {
+    
+                const key = String(Object.keys(resource)[0]),
+                      path = String(Object.values(resource)[0]),
+                      filetype = System.Config.utils.strings.getFileType(path);  
+
+                switch (filetype)
+                {
+                    case 'glb': await scene3d.third.load.gltf(key).then(data => System.Process.app.ThirdDimension.cache.push({ key: key, data })); break;
+                    case 'fbx': await scene3d.third.load.fbx(key).then(data => System.Process.app.ThirdDimension.cache.push({ key: key, data })); break;
+                }
+
+                numAssets++;
+
+                if(numAssets >= resources['assets'].length)
+                {
+
+                    scene.scene.get('HUD3D')['stopAlerts']();
+
+                    setTimeout(()=> res(), 1000);
+                }
+    
+            });
+    
+        });
+    }
 
 
 

@@ -7,9 +7,10 @@ import { Actor } from './Actor';
 
 export class LevelManager3D {
 
-  private static currentLevel: string 
+  private static currentLevel: string = ''
   
   public static level: Actor
+  public static bounds: { left: number, right: number, top: number, bottom: number } | null 
 
   //------------------------------------------- load map
 
@@ -19,7 +20,7 @@ export class LevelManager3D {
     LevelManager3D.currentLevel = key;
     LevelManager3D.level = new Actor(scene, LevelManager3D.currentLevel);
 
-    await LevelManager3D.level.preload(true);
+    await LevelManager3D.level.preload();
     await LevelManager3D.setCollisions(scene);
 
     switch (LevelManager3D.currentLevel)
@@ -46,6 +47,7 @@ export class LevelManager3D {
         obj.forEach((child: ENABLE3D.ExtendedObject3D ) => {
 
         child.castShadow = child.receiveShadow = true;
+
           res(
             scene.third.physics.add.existing(child, {
               shape: 'convex',
@@ -60,25 +62,40 @@ export class LevelManager3D {
     
   } 
 
-    //-------------------------------------------- make skybox
+  //-------------------------------------------- make skybox
 
 
-    public static makeSkybox(scene: ENABLE3D.Scene3D, key: string): void
-    {
+  public static makeSkybox(scene: ENABLE3D.Scene3D, key: string): void
+  {
+
+    const loader = new ENABLE3D.THREE.CubeTextureLoader(),
+          texture = loader.load([
+            key, 
+            key, 
+            key, 
+            key, 
+            key, 
+            key
+        ]);
+
+    scene.third.heightMap.scene.background = texture;
+
+  }
+
+  //------------------------------------------ reset defaults
   
-      const loader = new ENABLE3D.THREE.CubeTextureLoader(),
-            texture = loader.load([
-              key, 
-              key, 
-              key, 
-              key, 
-              key, 
-              key
-          ]);
-  
-      scene.third.heightMap.scene.background = texture;
-  
-    }
+
+  public static reset(scene: ENABLE3D.Scene3D): void
+  {
+
+    LevelManager3D.level.obj.scene.children.map((i: ENABLE3D.ExtendedObject3D) => {
+        if (i.hasBody)
+        scene.third.physics.destroy(i);
+    });
+
+    LevelManager3D.bounds = null;
+    LevelManager3D.currentLevel = '';
+  }
   
 
    

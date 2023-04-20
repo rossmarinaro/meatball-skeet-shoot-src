@@ -13,6 +13,7 @@ import { Background } from '../preload/Background.js';
 import { Text, TextUI } from './Text';
 import { ThirdDimension } from './ThirdDimension';
 import { EventManager } from './Events';
+import { HUD3D } from '../game/hud';
 
 
 export default class Application {
@@ -88,6 +89,7 @@ export default class Application {
             new Boot,
             new Preload, 
             new Background,
+            new HUD3D, 
             new TextUI,
             ...Game.scene 
         ];

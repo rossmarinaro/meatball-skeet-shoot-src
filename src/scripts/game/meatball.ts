@@ -1,6 +1,7 @@
 import * as ENABLE3D from '@enable3d/phaser-extension';
 import { System } from '../internals/Config';
 import { Actor } from './Actor';
+import { SkeetShoot } from './main';
 
 //--------- MEATBALL
 
@@ -51,7 +52,8 @@ export class Meatball extends Actor {
 
     this.active = false;
 
-    this.scene['score']++;
+    SkeetShoot.incrementScore();
+    
     System.Process.app.audio.play('fire_fx', 6, false, this.scene, 0);
 
       this.traverse((i: any) => {  

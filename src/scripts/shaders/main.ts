@@ -85,6 +85,7 @@ export class ShaderManager {
     }): THREE.ShaderMaterial
     {
 
+
         //BLEND MODES: AdditiveBlending, SubtractiveBlending, MultiplyBlending, NormalBlending, NoBlending
 
         const shader = new THREE.ShaderMaterial({
@@ -92,10 +93,10 @@ export class ShaderManager {
             vertexShader: ShaderManager.shader[vert], 
             fragmentShader: ShaderManager.shader[frag],
             blending: settings.blending ? THREE[settings.blending] : THREE.NormalBlending, 
-            transparent: settings.transparent,  
-            depthTest: settings.depthTest,
-            depthWrite: settings.depthWrite,
-            vertexColors: settings.vertexColors  
+            transparent: settings.transparent ? settings.transparent : false,  
+            depthTest: settings.depthTest ? settings.depthTest : false,
+            depthWrite: settings.depthWrite ? settings.depthWrite : false,
+            vertexColors: settings.vertexColors ? settings.vertexColors : false  
         });
 
         ShaderManager.shaderMaterials.push(shader);

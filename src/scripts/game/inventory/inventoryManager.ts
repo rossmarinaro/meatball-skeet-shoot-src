@@ -74,7 +74,7 @@ export class Inventory3D {
                   article = await System.Process.utils.strings.checkVowel(str),
                   player = scene['player'];
 
-            scene['hud'].alert('small', `You picked up ${article} ${str}`);
+            scene.scene.get('HUD3D')['alert']('small', `You picked up ${article} ${str}`);
 
             if (Inventory3D.powerups.includes(obj['key']))
                 player.initPowerup(obj['key']);

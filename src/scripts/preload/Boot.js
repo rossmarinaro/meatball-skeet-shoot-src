@@ -2,7 +2,7 @@
 import resources_main from './resources/main.json';
 import resources_3d from './resources/3d.json';
 import JoyStick from '../plugins/joystick.js';
-import Utils from '../internals/Utils';
+
 
 
 export class Boot extends Phaser.Scene { 
@@ -18,10 +18,6 @@ export class Boot extends Phaser.Scene {
             
 
             this.scene.run('Background', 'blank');
-
-        //utilities
-
-            System.Process.utils = Utils;
             
         //game scale 
 
@@ -42,11 +38,11 @@ export class Boot extends Phaser.Scene {
         }
         async preload()
         {
-            //// assets
+            // assets
                 this.load.json('resources_main', resources_main);
                 this.load.json('resources_3d', resources_3d);
 
-            ////plugins
+            //plugins
 
                 this.load.plugin('rexvirtualjoystickplugin', JoyStick, true);
         }
