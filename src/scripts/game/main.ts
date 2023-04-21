@@ -1,12 +1,9 @@
 /* SHOOTING RANGE */
 
 import * as ENABLE3D from '@enable3d/phaser-extension';
-
 import { System } from '../internals/Config'
-
 import { Meatball } from './meatball';
 import { Actor } from '../game/Actor';
-
 
 
 export class SkeetShoot extends ENABLE3D.Scene3D {

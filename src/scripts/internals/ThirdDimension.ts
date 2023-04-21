@@ -173,8 +173,8 @@ export class ThirdDimension {
     {
 
         ThirdDimension.reset(scene);
-        //scene.clearThirdDimension();
-        //ThirdDimension.cache = [];
+        scene.clearThirdDimension();
+        ThirdDimension.cache = [];
 
     }
 

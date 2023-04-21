@@ -4,6 +4,7 @@ import { parseResources } from '../internals/parser';
 import { THREE } from '@enable3d/phaser-extension';
 
 export class Preload extends Phaser.Scene {
+    
 	constructor() {
 
 	    super("Preload");
@@ -22,7 +23,7 @@ export class Preload extends Phaser.Scene {
 	}
 
 
-//----------------------------------------------------------------------------------------------------------------
+//---------------------
 
 	init(data)
     {
@@ -32,7 +33,7 @@ export class Preload extends Phaser.Scene {
 
 	}
 
-//----------------------------------------------------------------------------------------------------------------
+//-----------------
 
 	async preload()
     {   
@@ -112,10 +113,13 @@ export class Preload extends Phaser.Scene {
         this.loadIterator = this.time.addEvent({delay: 1000, callback: updateLoad, callbackScope: this, repeat: -1});
 
         scene.load.on('progress', value =>{
+
             this.percentText.setText(parseInt(value * 100) + '%');
             this.progressBarGraphics.clear();    
             this.progressBarGraphics.fillGradientStyle(0xff0000, 0xff0000, 0xFCB144, 0xFCB144, 1).fillRoundedRect((60 / 100) * width, (87.4 / 100) * height, (76 / 100) * width * value, 30, 2);
-    //// destroy progress bar
+    
+        // destroy progress bar
+
             if (this.percentText._text === '100%')
                 System.Process.gameState === true ? 
                     this.destroyProgressBar() : scene.time.delayedCall(3000, ()=> this.destroyProgressBar());  

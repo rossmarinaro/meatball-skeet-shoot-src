@@ -69,14 +69,7 @@ export class LevelManager3D {
   {
 
     const loader = new ENABLE3D.THREE.CubeTextureLoader(),
-          texture = loader.load([
-            key, 
-            key, 
-            key, 
-            key, 
-            key, 
-            key
-        ]);
+          texture = loader.load([key, key, key, key, key, key]);
 
     scene.third.heightMap.scene.background = texture;
 
