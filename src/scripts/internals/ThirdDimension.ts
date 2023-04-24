@@ -14,7 +14,7 @@ import { Controller3D } from '../game/controller';
 import { LevelManager3D } from '../game/levelManager';
 import { Lighting } from '../game/lighting';
 import { Actor } from '../game/Actor';
-import { SkeetShoot } from '../game/main';
+
 
 export class ThirdDimension {
 
@@ -23,6 +23,7 @@ export class ThirdDimension {
     public static debugParams: boolean
 
     public static cache: { key: string, data: any }[] = []
+    
     public static Player3D: typeof Player3D = Player3D
     public static Particles3D: typeof Particles3D = Particles3D
     public static Inventory3D: typeof Inventory3D = Inventory3D
@@ -53,6 +54,7 @@ export class ThirdDimension {
     
             System.Config.makeTransparantBackground(scene['__scene']);
 
+            scene.clearThirdDimension();
             scene.accessThirdDimension({ maxSubSteps: 10, fixedTimeStep: 1 / 180 });  
             
         //default camera position
@@ -76,7 +78,7 @@ export class ThirdDimension {
     
             ThirdDimension.backgroundFill = scene.add.graphics({fillStyle: {color: 0x000000}}).fillRectShape(new Phaser.Geom.Rectangle(0, 0, 30000, 30000));
 
-            scene.scene.run('HUD3D', scene);
+            scene.scene.launch('HUD3D', scene);
 
             res();
         });
@@ -91,16 +93,15 @@ export class ThirdDimension {
  
         return new Promise(async res => {
 
+            const hud = scene.scene.get('HUD3D');
+
             scene.third.camera.lookAt(-10, 10, 10);
             
         //preload assets 
 
-           if (!SkeetShoot.loaded)
-           {
-                await scene.scene.get('Preload')['load3DAssets'](scene['__scene'], scene); 
-            
-                SkeetShoot.loaded = true;
-           }
+            await scene.scene.get('Preload')['loadAssets'](scene['__scene'], scene); 
+
+            hud['stopAlerts'](); 
 
            ThirdDimension.backgroundFill.destroy();
             
@@ -111,7 +112,7 @@ export class ThirdDimension {
         //init hud display
 
 
-            await scene.scene.get('HUD3D')['initDisplay']();
+            await hud['initDisplay']();
 
 
             if (playerParams)
@@ -127,7 +128,7 @@ export class ThirdDimension {
 
             //update HUD
 
-                scene.scene.get('HUD3D')['runUpdate']();
+                hud['runUpdate']();
 
             }
 

@@ -9,6 +9,9 @@ export class HUD3D extends Phaser.Scene {
     public _scene: any
     private initialized: boolean = false;
 
+    private GAME_WIDTH: number
+    private GAME_HEIGHT: number
+
     private crossHairs: {
       _1: Phaser.GameObjects.Rectangle
       _2: Phaser.GameObjects.Rectangle
@@ -38,25 +41,26 @@ export class HUD3D extends Phaser.Scene {
     private create(scene: ENABLE3D.Scene3D): void
     {
 
+      System.Process.app.ui.listen(this, 'Preload'); 
+
       this._scene = scene;
 
+      const x = this.GAME_WIDTH / 2 - 120,
+            y = this.GAME_HEIGHT / 2 - 250;
 
-      //pop up text
+      this.popUpSmall = this.add.text(x, y, '', { fontSize: "1.5rem", fontFamily: "Bangers" }).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false).setVisible(false);
+      this.popUpLarge = this.add.text(x, y, '', { fontSize: "1.7rem", fontFamily: "Digitizer" }).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false)//.setVisible(false);
 
-      const scaleFactor = System.Config.isPortrait(this) ? 
-        (25 / 100) * this.cameras.main.width :
-        (37 / 100) * this.cameras.main.width;
-
-      this.popUpLarge = this._scene.add.text(scaleFactor, 300, '', {fontSize: "30px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false).setVisible(false);
-      this.popUpSmall = this._scene.add.text(scaleFactor, 300, '', {fontSize: "15px", fontFamily: "Bangers"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false).setVisible(false);
-
+      this.optionalText = this.add.text(this.GAME_WIDTH / 2 - 65, this.GAME_HEIGHT / 2 - 180, '', {fontSize: "20px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false).setVisible(false);
+      this.optionalTween = this.tweens.add({targets: this.optionalText, alpha: 0, duration: 2000, ease: 'Sine.easeOut', repeat: -1, yoyo: true, yoyoDelay: 500});
+    
       this.initialized = true;
 
       //listen for resize
 
-      this.scale.on('resize', ()=> this.resizeWindow(this._scene), false);
-      screen.orientation?.addEventListener('change', ()=> this.resizeWindow(this._scene), false);
-      screen.orientation?.addEventListener('webkitfullscreenchange', ()=> this.resizeWindow(this._scene), false);
+      this.scale.on('resize', ()=> this.resizeWindow(this), false);
+      screen.orientation?.addEventListener('change', ()=> this.resizeWindow(this), false);
+      screen.orientation?.addEventListener('webkitfullscreenchange', ()=> this.resizeWindow(this), false);
 
     }
 
@@ -66,7 +70,8 @@ export class HUD3D extends Phaser.Scene {
 
     public async initDisplay(): Promise<void>
     {
-        //------------- UI
+      
+      System.Process.app.ui.stop(this);
       
         this.crossHairs = {
           _1: this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 50, 2, 0x000000),
@@ -196,31 +201,30 @@ export class HUD3D extends Phaser.Scene {
     public alert(size: string, message: string, optional?: string): void
     {   
 
-      switch (size)
-      {
-        case 'small': 
-          this.popUpSmall?.setVisible(true).setText(message); 
-          this.popUpLarge?.setVisible(false);
-        break;
-        case 'large': 
-          this.popUpLarge?.setVisible(true).setText(message); 
-          this.popUpSmall?.setVisible(false);
-        break;
-      }
-      if (optional)
-      {
-        const scaleFactor = System.Config.isPortrait(this) ? 
-        (25 / 100) * this.cameras.main.width :
-        (37 / 100) * this.cameras.main.width;
+      this.time.delayedCall(500, () => {
 
-        this.optionalText = this.add.text(scaleFactor, 360, optional, {fontSize: "20px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
-        this.optionalTween = this.tweens.add({targets: this.optionalText, alpha: 0, duration: 2000, ease: 'Sine.easeOut', repeat: -1, yoyo: true, yoyoDelay: 500});
-      }
-      else
-        this.time.delayedCall(3000, () => {
-          this.popUpSmall?.setVisible(false); 
-          this.popUpLarge?.setVisible(false);
-        });
+        switch (size)
+        {
+          case 'small': 
+            this.popUpSmall.setVisible(true).setText(message);
+            this.popUpLarge.setVisible(false);
+          break;
+          case 'large': 
+            this.popUpLarge.setVisible(true).setText(message);
+            this.popUpSmall.setVisible(false);
+          break;
+        }
+
+        if (optional)
+        {
+
+          this.optionalText.setVisible(true).setText(optional);
+          this.optionalTween.play();
+        }
+
+        else
+          this.time.delayedCall(3000, () => this.stopAlerts());
+      });
     }
 
 
@@ -229,10 +233,10 @@ export class HUD3D extends Phaser.Scene {
 
     public stopAlerts(): void
     {
-      this.popUpLarge?.setVisible(false);
-      this.popUpSmall?.setVisible(false);
-      this.optionalText?.setVisible(false);
-      this.optionalTween?.remove();
+      this.popUpLarge.setVisible(false);
+      this.popUpSmall.setVisible(false);
+      this.optionalText.setVisible(false);
+      this.optionalTween.stop();
     }
 
 

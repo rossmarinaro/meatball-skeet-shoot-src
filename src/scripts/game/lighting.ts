@@ -33,9 +33,9 @@ export class Lighting {
     Lighting.dirlight.castShadow = true;
     Lighting.dirlight.shadow.bias = -0.001;
     Lighting.dirlight.shadow.mapSize.width = 5000;
-    Lighting.dirlight.shadow.mapSize.height = 348;
+    Lighting.dirlight.shadow.mapSize.height = 350;
     Lighting.dirlight.shadow.camera.near = 500;
-    Lighting.dirlight.shadow.camera.far = 500.0;
+    Lighting.dirlight.shadow.camera.far = 500;
     Lighting.dirlight.shadow.camera.left = 5000;
     Lighting.dirlight.shadow.camera.right = -5000;
     Lighting.dirlight.shadow.camera.top = 5000;

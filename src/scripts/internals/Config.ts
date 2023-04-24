@@ -11,6 +11,7 @@ export namespace System {
     export class Config {
 
         private Canvas: Readonly<typeof Canvas>
+        
         public static utils: typeof Utils = Utils
 
         public game: Readonly<Phaser.Game>
@@ -58,7 +59,9 @@ export namespace System {
         public orientation: orientation = {
     
             on: (event: string, callback: any, state: any): void => {
-                if (typeof screen.orientation !== null && typeof screen.orientation !== 'undefined' && Config.mobileAndTabletCheck()) 
+                if (typeof screen.orientation !== null && 
+                    typeof screen.orientation !== void 0 && 
+                    Config.mobileAndTabletCheck()) 
                     return screen.orientation.addEventListener(event, callback, state)
             },
             off: (event: string, callback: any, state: any): void => {
@@ -66,11 +69,15 @@ export namespace System {
                     return screen.orientation.removeEventListener(event, callback, state)
             },
             lock: (aspectRatio: OrientationLockType): any => {
-                if (typeof screen.orientation.lock !== null && typeof screen.orientation !== 'undefined' && Config.mobileAndTabletCheck()) 
+                if (typeof screen.orientation.lock !== null && 
+                    typeof screen.orientation !== void 0 && 
+                    Config.mobileAndTabletCheck()) 
                     return screen.orientation.lock(aspectRatio);
             },
             unlock: (): any => {
-                if (typeof screen.orientation.unlock !== null && typeof screen.orientation !== 'undefined' && Config.mobileAndTabletCheck()) 
+                if (typeof screen.orientation.unlock !== null && 
+                    typeof screen.orientation !== void 0 && 
+                    Config.mobileAndTabletCheck()) 
                     return screen.orientation.unlock();
             }
         }
@@ -79,10 +86,10 @@ export namespace System {
         //---------------------------------------------------------
       
     
-        constructor(canvas: any)
+        constructor()
         {
             
-            this.Canvas = canvas;
+            this.Canvas = {...Canvas({ antialias: true })};
             this.app = null; 
             this.parent = 'game';
             this.key = '';
@@ -227,7 +234,7 @@ export namespace System {
     
     
     
-    export const Process = new Config({...Canvas({ antialias: true })});
+    export const Process = new Config();
     
     
 }

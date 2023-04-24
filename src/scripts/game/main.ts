@@ -15,7 +15,6 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
   private swankyVelvet: ENABLE3D.ExtendedObject3D
   private enemies: Meatball[] = []
 
-  public static loaded: boolean = false
   public static gameState: boolean = false
   private static score: number = 0
   private static level: number = 1

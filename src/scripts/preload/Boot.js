@@ -38,13 +38,13 @@ export class Boot extends Phaser.Scene {
         }
         async preload()
         {
-            // assets
-                this.load.json('resources_main', resources_main);
-                this.load.json('resources_3d', resources_3d);
+        // assets
+            this.load.json('resources_main', resources_main);
+            this.load.json('resources_3d', resources_3d);
 
-            //plugins
+        //plugins
 
-                this.load.plugin('rexvirtualjoystickplugin', JoyStick, true);
+            this.load.plugin('rexvirtualjoystickplugin', JoyStick, true);
         }
         
     //------------------------------- run preload scene
@@ -53,11 +53,7 @@ export class Boot extends Phaser.Scene {
         {   
             this.add.text(0, 0, '', { font: "1px Digitizer", fill: ''}).setAlpha(0);
             this.add.text(0, 0, '', { font: "1px Bangers", fill: ''}).setAlpha(0);
-            this.time.delayedCall(500, ()=> {
-                
-               this.scene.run('Preload', this.data);
-
-            });
+            this.time.delayedCall(500, ()=>  this.scene.run('Preload', this.data));
         }
     }
 

@@ -14,6 +14,7 @@ import { Text, TextUI } from './Text';
 import { ThirdDimension } from './ThirdDimension';
 import { EventManager } from './Events';
 import { HUD3D } from '../game/hud';
+import { UI } from './UI';
 
 
 export default class Application {
@@ -25,6 +26,9 @@ export default class Application {
     public shaders: typeof ShaderManager = ShaderManager
     public text: typeof Text = Text
     public ThirdDimension: typeof ThirdDimension = ThirdDimension
+
+    public ui: typeof UI = UI
+
     public scale: any
     public pipeline: any[]
 
@@ -89,9 +93,9 @@ export default class Application {
             new Boot,
             new Preload, 
             new Background,
+            ...Game.scene,
             new HUD3D, 
-            new TextUI,
-            ...Game.scene 
+            new TextUI
         ];
     }
 
