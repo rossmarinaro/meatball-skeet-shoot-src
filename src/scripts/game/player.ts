@@ -63,7 +63,7 @@ export class Player3D extends Actor {
         shape: 'capsule', 
         mass: 1.8, 
         radius: 3, 
-        offset: { y: 5 }, height: 10
+        height: 10
       },
 
       startingWeapon = this.data && this.data.currentEquipped ? this.data.currentEquipped : 'rolling_pin1';
@@ -175,10 +175,6 @@ export class Player3D extends Actor {
             }
         });
       
-      //sets 3d model's origin
-
-        this.obj.position.set(0, -13, 0); 
-        this.obj.rotation.set(0, -140, 0);
 
         //initialized
  
@@ -485,14 +481,6 @@ export class Player3D extends Actor {
       pos.multiplyScalar(0.8 + this.movement.z);
       pos.add(this.raycaster.ray.origin);
 
-      const direction = this.scene.third.camera.getWorldDirection(this.raycaster.ray.direction);
-
-      //set skin's rotation
-
-        this.rotation.y = this.movement.direction === 'up' ? 
-        -Math.atan2(direction.x, direction.z) : 
-        -Math.atan2(direction.z, direction.x);
-
       //swap player fp weapon perspective view
 
       if (this.currentEquipped.obj)
@@ -517,19 +505,28 @@ export class Player3D extends Actor {
         this.currentEquipped.obj.rotation.copy(this.scene.third.camera.rotation);   
       }
 
+      //set rotation when moving
+
+      if (this.movement.direction !== null)
+      {
+
+        const direction = this.scene.third.camera.getWorldDirection(this.raycaster.ray.direction);
+        
+        this.rotation.y = Math.atan2(direction.normalize().x, direction.normalize().z);
+
+      }
    
-        //copy player's skin position to its physics body
+      //copy player's skin position to its physics body
 
-        if (this['obj'])
-          this.position.copy(this.rigidBody.position);
+      this.position.copy(this.rigidBody.position);
 
-        this.rigidBody.body.needUpdate = true;
-       
-        this.rigidBody.body.on.collision(otherObject => {
+      this.rigidBody.body.needUpdate = true;
+      
+      this.rigidBody.body.on.collision(otherObject => {
 
-          if (!otherObject.name.includes('bh_model'))
-            this.canJump = true; 
-        });  
+        if (!otherObject.name.includes('bh_model'))
+          this.canJump = true; 
+      });  
 
         
         if (this.collide && this.body.velocity.y <= 0)

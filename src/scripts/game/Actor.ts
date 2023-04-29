@@ -1,6 +1,7 @@
 
-
 import * as ENABLE3D from '@enable3d/phaser-extension';
+import * as SkeletonUtils from '../plugins/skeletonUtils.js'
+
 import { System } from '../internals/Config'
 
 
@@ -86,7 +87,7 @@ export class Actor extends ENABLE3D.ExtendedObject3D {
            
               break;
 
-              case 'fbx': this.add(resource.data); break;
+              case 'fbx': this.add(SkeletonUtils.clone(resource.data)); break;
 
               default: 
                 return console.log('Actor Preload Failed: No model data found.'); 

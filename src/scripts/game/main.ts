@@ -4,12 +4,13 @@ import * as ENABLE3D from '@enable3d/phaser-extension';
 import { System } from '../internals/Config'
 import { Meatball } from './meatball';
 import { Actor } from '../game/Actor';
+import { Clock } from '../internals/Clock';
 
 
 export class SkeetShoot extends ENABLE3D.Scene3D {
 
   public rounds: number = 1
-  public timeLeft: number = 30.000
+  public timeLeft: string
 
   private __scene: Phaser.Scene 
   private swankyVelvet: ENABLE3D.ExtendedObject3D
@@ -35,8 +36,6 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
    if (SkeetShoot.level > 1)
     SkeetShoot.spawns += SkeetShoot.spawns / 2;
 
-   if (SkeetShoot.spawns > 10) 
-     this.timeLeft = this.timeLeft * 1.25; 
 
   }
 
@@ -55,15 +54,7 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
     //spawn meatball targets
 
     for (let i = 0; i < SkeetShoot.spawns; i++)
-    {
-
-      let x = Phaser.Math.Between(-200, 200),
-          y = Phaser.Math.Between(30, 120),
-          z = Phaser.Math.Between(-300, -500);
-
-      this.enemies.push(new Meatball(this, x, y, z)); 
-
-    }
+      this.enemies[i] = new Meatball(this, Phaser.Math.Between(-200, 200), Phaser.Math.Between(30, 120), Phaser.Math.Between(-300, -500));
 
     //swanky velvet
 
@@ -75,6 +66,9 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
     });
 
+    //format the time and decrement
+
+    Clock.decrementTime(this, SkeetShoot.spawns > 10 ? 30000 * 1.25 : 30000);
 
   }
 
@@ -83,17 +77,28 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
   public update (): void
   {
-    if (SkeetShoot.score >= SkeetShoot.spawns)
+    if (SkeetShoot.score >= SkeetShoot.spawns || this.timeLeft === '0:00')
       SkeetShoot.gameState = false; //you win
   }
 
 
   //----------------------------------
 
+  
+  public setTime(factor: string): void
+  {
+    this.timeLeft = factor;
+  }
+
+  
+  //---------------------------------
+
   public static incrementScore(): void
   {
     SkeetShoot.score++;
   } 
+
+  //---------------------------------
 
   
   public static getGameState(): boolean
@@ -121,8 +126,10 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
   public gameOver(): void
   {
 
+    if (!SkeetShoot.gameState)
+      return;
+
     SkeetShoot.gameState = false;
-    this.timeLeft = 30.000;
 
     this.swankyVelvet.anims.play('Laugh');
     this.time.addEvent(

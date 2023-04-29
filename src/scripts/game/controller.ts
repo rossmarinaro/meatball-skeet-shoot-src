@@ -36,7 +36,6 @@ export class Controller3D {
 
   public perspectiveControls: {
     type: string
-    current: ENABLE3D.FirstPersonControls | ENABLE3D.ThirdPersonControls | null
     camera: {
       first: ENABLE3D.FirstPersonControls
       third: ENABLE3D.ThirdPersonControls
@@ -74,7 +73,6 @@ export class Controller3D {
       this.perspectiveControls = {
 
         type: 'first',
-        current: null,
         camera: {
           first: new ENABLE3D.FirstPersonControls(this.scene.third.camera, this.player, {targetRadius: 0}),
           third: new ENABLE3D.ThirdPersonControls(this.scene.third.camera, this.player, {targetRadius: 30})
@@ -88,7 +86,7 @@ export class Controller3D {
             
             camera.offset = new ENABLE3D.THREE.Vector3 (
               this.perspectiveControls.type === 'third' ? -direction.normalize().x * 50 : 0, 
-              6, 
+              15, 
               this.perspectiveControls.type === 'third' ? -direction.normalize().z * 50 : 0
             );
         },
@@ -105,11 +103,6 @@ export class Controller3D {
           this.perspectiveControls.camera.first.update(x, y);
         }
       }
-
-
-    //set default current camera to third person view
-
-      this.perspectiveControls.current = this.perspectiveControls.camera.third;
 
 
       if (System.Config.mobileAndTabletCheck()) //virtual controls
@@ -321,7 +314,7 @@ export class Controller3D {
        this.perspectiveControls.type = camera === this.perspectiveControls.camera.first ?
           'first' : 'third';
     
-        this.perspectiveControls.current = camera;
+
     }
 
 

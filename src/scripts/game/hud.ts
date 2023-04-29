@@ -147,8 +147,6 @@ export class HUD3D extends Phaser.Scene {
             if (this.textA)
             {
 
-              this.textAValue.setVisible(SkeetShoot.getGameState())
-
               //timed game
 
               const exit = () => {
@@ -165,15 +163,18 @@ export class HUD3D extends Phaser.Scene {
 
               }
 
-              if (this._scene.timeLeft <= 0)
+              if (this._scene.timeLeft === '0:00')
                 exit();
 
               if (SkeetShoot.getGameState())
               {
-                this._scene.timeLeft -= 0.025;
-                
-                this.textAValue.setText(this._scene.timeLeft.toFixed(3));
-                if (this._scene.timeLeft <= 10.0)
+
+                this.textAValue.setText(this._scene.timeLeft);
+
+                if (
+                  Number(this._scene.timeLeft.substr(0, 1)) === 0 && 
+                  Number(this._scene.timeLeft.substr(2, 1)) <= 1
+                )
                   this.textAValue.setTint(0xff0000);  
               }
               else
