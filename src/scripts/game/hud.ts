@@ -1,25 +1,19 @@
 // HUD
 
 import * as ENABLE3D from '@enable3d/phaser-extension';
-import { System } from '../internals/Config';
 import { SkeetShoot } from './main';
 
 export class HUD3D extends Phaser.Scene {
 
     public _scene: any
     private initialized: boolean = false;
-
-    private GAME_WIDTH: number
-    private GAME_HEIGHT: number
-
+    
     private crossHairs: {
       _1: Phaser.GameObjects.Rectangle
       _2: Phaser.GameObjects.Rectangle
     }
 
     private ammo: Phaser.GameObjects.Text
-    private popUpSmall: Phaser.GameObjects.Text
-    private popUpLarge: Phaser.GameObjects.Text
 
     private textA: Phaser.GameObjects.Text
     private textAValue: Phaser.GameObjects.Text
@@ -30,31 +24,21 @@ export class HUD3D extends Phaser.Scene {
     private textC: Phaser.GameObjects.Text
     private textCValue: Phaser.GameObjects.Text
 
-    private optionalText: Phaser.GameObjects.Text
-    private optionalTween: Phaser.Tweens.Tween
-
 
     constructor(){
       super('HUD3D');
     }
 
-    private create(scene: ENABLE3D.Scene3D): void
+    public async _init(): Promise<void>
     {
 
-      System.Process.app.ui.listen(this, 'Preload'); 
-
-      this._scene = scene;
-
-      const x = this.GAME_WIDTH / 2 - 120,
-            y = this.GAME_HEIGHT / 2 - 250;
-
-      this.popUpSmall = this.add.text(x, y, '', { fontSize: "1.5rem", fontFamily: "Bangers" }).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false).setVisible(false);
-      this.popUpLarge = this.add.text(x, y, '', { fontSize: "1.7rem", fontFamily: "Digitizer" }).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false)//.setVisible(false);
-
-      this.optionalText = this.add.text(this.GAME_WIDTH / 2 - 65, this.GAME_HEIGHT / 2 - 180, '', {fontSize: "20px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false).setVisible(false);
-      this.optionalTween = this.tweens.add({targets: this.optionalText, alpha: 0, duration: 2000, ease: 'Sine.easeOut', repeat: -1, yoyo: true, yoyoDelay: 500});
-    
-      this.initialized = true;
+          
+      this.crossHairs = {
+          _1: this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 50, 2, 0x000000),
+          _2: this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 2, 50, 0x000000)
+      }
+      
+      await this.createUI(20, 'TIME LEFT: ', 'HIT: ', 'LEVEL: '); 
 
       //listen for resize
 
@@ -62,23 +46,9 @@ export class HUD3D extends Phaser.Scene {
       screen.orientation?.addEventListener('change', ()=> this.resizeWindow(this), false);
       screen.orientation?.addEventListener('webkitfullscreenchange', ()=> this.resizeWindow(this), false);
 
-    }
+      this.initialized = true;
 
-
-
-    //------------------------------------
-
-    public async initDisplay(): Promise<void>
-    {
-      
-      System.Process.app.ui.stop(this);
-      
-        this.crossHairs = {
-          _1: this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 50, 2, 0x000000),
-          _2: this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 2, 50, 0x000000)
-      }
-        
-      await this.createUI(20, 'TIME LEFT: ', 'HIT: ', 'LEVEL: '); 
+   
     }
 
     //------------------------------------ create UI
@@ -103,29 +73,28 @@ export class HUD3D extends Phaser.Scene {
 
     //------------------------------------- update
 
-
-    public runUpdate(): void
+ 
+    public runUpdate(scene: any): void
     {
 
       let gameOver = false;
 
       //----------- on scene update
   
-        this._scene.events.on('update', ()=> {
 
-          if (!this.initialized || (this._scene.player === null || !this._scene.player.raycaster))
+          if (!this.initialized || (scene.player === null || !scene.player.raycaster))
             return;
 
             
-          this._scene.third.camera.getWorldDirection(this._scene.player.raycaster.ray.direction);
+          scene.third.camera.getWorldDirection(scene.player.raycaster.ray.direction);
               
 
           //----------toggle perspective camera
 
 
           for (let i of Object.values(this.crossHairs))
-            if (this._scene.controller)
-              i.setVisible(this._scene.controller.perspectiveControls.type === 'first' ? true : false);
+            if (scene.controller)
+              i.setVisible(scene.controller.perspectiveControls.type === 'first' ? true : false);
 
           
           //--------- update ammo text
@@ -134,11 +103,11 @@ export class HUD3D extends Phaser.Scene {
           if (this.ammo)
             this.ammo
               .setText(
-                this._scene.player.currentEquipped.quantity >= 1 ? 
-                this._scene.player.currentEquipped.quantity.toString() : '0'
+                scene.player.currentEquipped.quantity >= 1 ? 
+                scene.player.currentEquipped.quantity.toString() : '0'
               )
-              .setColor(this._scene.player.currentEquipped.quantity >= 1 ? "#ffffff" : "#ff0000")
-              .setStroke(this._scene.player.currentEquipped.quantity >= 1 ? '#000000' : '#ffffff', 3);
+              .setColor(scene.player.currentEquipped.quantity >= 1 ? "#ffffff" : "#ff0000")
+              .setStroke(scene.player.currentEquipped.quantity >= 1 ? '#000000' : '#ffffff', 3);
 
 
           //---------- update textA
@@ -159,21 +128,21 @@ export class HUD3D extends Phaser.Scene {
                 if (this.textAValue)
                   this.textAValue.setText('0');
 
-                this._scene.gameOver();
+                scene.gameOver();
 
               }
 
-              if (this._scene.timeLeft === '0:00')
+              if (scene.timeLeft === '0:00')
                 exit();
 
               if (SkeetShoot.getGameState())
               {
 
-                this.textAValue.setText(this._scene.timeLeft);
+                this.textAValue.setText(scene.timeLeft);
 
                 if (
-                  Number(this._scene.timeLeft.substr(0, 1)) === 0 && 
-                  Number(this._scene.timeLeft.substr(2, 1)) <= 1
+                  Number(scene.timeLeft.substr(0, 1)) === 0 && 
+                  Number(scene.timeLeft.substr(2, 1)) <= 1
                 )
                   this.textAValue.setTint(0xff0000);  
               }
@@ -192,58 +161,9 @@ export class HUD3D extends Phaser.Scene {
             if (this.textC)
               this.textCValue.setText(SkeetShoot.getLevel()).setVisible(SkeetShoot.getGameState()); 
 
-        });
     }
 
-
-    //------------------------------------ pop up notification
-
-    
-    public alert(size: string, message: string, optional?: string): void
-    {   
-
-      this.time.delayedCall(500, () => {
-
-        switch (size)
-        {
-          case 'small': 
-            this.popUpSmall.setVisible(true).setText(message);
-            this.popUpLarge.setVisible(false);
-          break;
-          case 'large': 
-            this.popUpLarge.setVisible(true).setText(message);
-            this.popUpSmall.setVisible(false);
-          break;
-        }
-
-        if (optional)
-        {
-
-          this.optionalText.setVisible(true).setText(optional);
-          this.optionalTween.play();
-        }
-
-        else
-          this.time.delayedCall(3000, () => this.stopAlerts());
-      });
-    }
-
-
-    //------------------------------------ stop all pop ups
-
-
-    public stopAlerts(): void
-    {
-      this.popUpLarge.setVisible(false);
-      this.popUpSmall.setVisible(false);
-      this.optionalText.setVisible(false);
-      this.optionalTween.stop();
-    }
-
-
-  //------------------------------------- resize
   
-
     private resizeWindow(scene: Phaser.Scene | ENABLE3D.Scene3D): void 
     {
 

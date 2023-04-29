@@ -15,6 +15,7 @@ import { ThirdDimension } from './ThirdDimension';
 import { EventManager } from './Events';
 import { HUD3D } from '../game/hud';
 import { UI } from './UI';
+import { Alerts } from './alerts'
 
 
 export default class Application {
@@ -95,7 +96,8 @@ export default class Application {
             new Background,
             ...Game.scene,
             new HUD3D, 
-            new TextUI
+            new TextUI,
+            new Alerts
         ];
     }
 

@@ -51,11 +51,6 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
     System.Process.app.ThirdDimension.Inventory3D.ammo.automac1000 = Infinity;
 
-    //spawn meatball targets
-
-    for (let i = 0; i < SkeetShoot.spawns; i++)
-      this.enemies[i] = new Meatball(this, Phaser.Math.Between(-200, 200), Phaser.Math.Between(30, 120), Phaser.Math.Between(-300, -500));
-
     //swanky velvet
 
     this.swankyVelvet = new Actor(this, 'sv', 70, -18, -60, true, true, ()=> {
@@ -65,6 +60,12 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
       this.swankyVelvet.scale.set(0.12, 0.12, 0.12);
 
     });
+
+    
+    //spawn meatball targets
+
+    for (let i = 0; i < SkeetShoot.spawns; i++)
+      this.enemies[i] = new Meatball(this, Phaser.Math.Between(-200, 200), Phaser.Math.Between(30, 120), Phaser.Math.Between(-300, -500));
 
     //format the time and decrement
 
@@ -146,7 +147,9 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
     this.time.delayedCall(3000, () => {   
 
-      this.scene.get('HUD3D')['alert']('large', `YOU ${SkeetShoot.score === SkeetShoot.spawns ? 'WIN' : 'LOSE'}!!!!`);
+      const alert = this.scene.get('Alerts');
+
+      alert['alert']('large', `YOU ${SkeetShoot.score === SkeetShoot.spawns ? 'WIN' : 'LOSE'}!!!!`);
 
       this.time.delayedCall(4000, () => {
 

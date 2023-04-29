@@ -11,7 +11,7 @@ export class UI {
 
 
     public static listen (scene: Phaser.Scene, key: string, callback?: Function): void
-    {
+    { 
 
         UI.canResize = true;
    
@@ -38,23 +38,6 @@ export class UI {
         scene.scale.on('resize', ()=> _resizeCheck(scene, key), scene);
         screen.orientation?.addEventListener('change', ()=> _resizeCheck(scene, key), false);
         screen.orientation?.addEventListener('webkitfullscreenchange', ()=> _resizeCheck(scene, key), false);
-    }
-
-    //-----------------------------------------------------------
-
-
-    public static stop (scene: Phaser.Scene): void
-    {
-        
-        UI.canResize = false;
-
-        const w = scene.scale.width,
-              h = scene.scale.height;
-
-        scene.cameras.main?.setViewport(0, 0, w, h).setZoom(1).centerOn(w / 2, h / 2);
-
-        screen.orientation?.removeEventListener('change', ()=> {}, false);
-        screen.orientation?.removeEventListener('webkitfullscreenchange', ()=> {}, false);
     }
 
 

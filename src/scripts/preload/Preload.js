@@ -54,15 +54,18 @@ export class Preload extends Phaser.Scene {
     {
 
         return new Promise(async res => {
-            
-           if (System.Process.app.ThirdDimension.cache.length > 0)
-                res();
 
             THREE.Cache.enabled = true;
 
-            const hud = scene3d.scene.get('HUD3D');
+            const alerts = scene.scene.get('Alerts');
+            
+           if (System.Process.app.ThirdDimension.cache.length > 0)
+            {
+                res();
+                return;
+            }
 
-            hud['alert']('large', 'Loading assets...', 'please wait');
+            alerts['alert']('large', 'Loading assets...', 'please wait');
 
             let numAssets = 0;
 
@@ -83,12 +86,7 @@ export class Preload extends Phaser.Scene {
                 numAssets++;
 
                 if(numAssets >= resources['assets'].length)
-                {
-
-                    hud['stopAlerts']();
-
-                    setTimeout(()=> res(), 500);
-                }
+                    setTimeout(()=> res(alerts['stopAlerts']()), 1000);
     
             });
     

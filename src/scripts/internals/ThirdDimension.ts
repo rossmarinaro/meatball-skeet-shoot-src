@@ -74,9 +74,10 @@ export class ThirdDimension {
                 window['renderer'] = scene.third.renderer.info;
             }
 
-            //run HUD scene in parallel
     
             ThirdDimension.backgroundFill = scene.add.graphics({fillStyle: {color: 0x000000}}).fillRectShape(new Phaser.Geom.Rectangle(0, 0, 30000, 30000));
+
+            //init hud display /run scene in parallel
 
             scene.scene.launch('HUD3D', scene);
 
@@ -88,12 +89,10 @@ export class ThirdDimension {
     //------------------------------ create map, player, controller, HUD
 
 
-    public static async create(scene: ENABLE3D.Scene3D, levelKey: string, playerParams?: any[]): Promise<void>  
+    public static async create(scene: ENABLE3D.Scene3D, levelKey: string, playerParams: any[]): Promise<void>  
     {
  
         return new Promise(async res => {
-
-            const hud = scene.scene.get('HUD3D');
 
             scene.third.camera.lookAt(-10, 10, 10);
             
@@ -101,42 +100,33 @@ export class ThirdDimension {
 
             await scene.scene.get('Preload')['loadAssets'](scene['__scene'], scene); 
 
-            hud['stopAlerts'](); 
-
            ThirdDimension.backgroundFill.destroy();
             
         //load map before objects
             
             await LevelManager3D.load(scene, levelKey);
 
-        //init hud display
+            const hud = scene.scene.get('HUD3D');
 
+        //init player
 
-            await hud['initDisplay']();
+            scene['player'] = new Player3D(scene, playerParams[0], playerParams[1], playerParams[2], playerParams[3], playerParams[4]);  
 
+        //init controls
 
-            if (playerParams)
-            {
+            scene['controller'].init(scene['player']);
 
-            //init player
-
-                scene['player'] = new Player3D(scene, playerParams[0], playerParams[1], playerParams[2], playerParams[3], playerParams[4]);  
-
-            //init controls
-
-                scene['controller'].init(scene['player']);
-
-            //update HUD
-
-                hud['runUpdate']();
-
-            }
+            hud['_init']();
 
         //set post processing pipeline
 
             System.Process.app.shaders.setPostProcessingBloom(scene, { bloomStrength: 0.5, bloomThreshold: 0, bloomRadius: 0.5 });
 
             scene.events.on('update', (time: number): void => {
+
+                //update HUD
+
+                hud['runUpdate'](scene);
 
         //update shaders
 

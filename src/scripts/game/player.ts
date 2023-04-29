@@ -483,11 +483,13 @@ export class Player3D extends Actor {
 
       //swap player fp weapon perspective view
 
+      const controls = this.scene['controller'].perspectiveControls;
+
       if (this.currentEquipped.obj)
       {
         if (this.alive === true && this.itemProp)
         {
-          if (this.scene['controller'].perspectiveControls.type === 'first')
+          if (controls.type === 'first')
           {
             this.currentEquipped.obj.visible = true;
             this.itemProp.visible = false;
@@ -507,15 +509,14 @@ export class Player3D extends Actor {
 
       //set rotation when moving
 
-      if (this.movement.direction !== null)
-      {
+      const direction = this.scene.third.camera.getWorldDirection(this.raycaster.ray.direction);
 
-        const direction = this.scene.third.camera.getWorldDirection(this.raycaster.ray.direction);
-        
+      if (this.movement.direction !== null)
         this.rotation.y = Math.atan2(direction.normalize().x, direction.normalize().z);
 
-      }
-   
+      else if (controls.type === 'first')
+        this.rotation.y = Math.atan2(direction.normalize().x, direction.normalize().z);
+      
       //copy player's skin position to its physics body
 
       this.position.copy(this.rigidBody.position);

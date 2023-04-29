@@ -74,7 +74,7 @@ export class Inventory3D {
                   article = await System.Process.utils.strings.checkVowel(str),
                   player = scene['player'];
 
-            scene.scene.get('HUD3D')['alert']('small', `You picked up ${article} ${str}`);
+            scene.scene.get('Alerts')['alert']('small', `You picked up ${article} ${str}`);
 
             if (Inventory3D.powerups.includes(obj['key']))
                 player.initPowerup(obj['key']);
@@ -256,17 +256,17 @@ export class Inventory3D {
 //------------------------------------------------- check names and set visibility to false
 
 
+
     private static checkObjNames(child: ENABLE3D.ExtendedObject3D, argA?: string, argB?: string, argC?: string): void
     {
-        if (
-            child.name === argA || 
-           (argB && child.name === argB) || 
-           (argC && child.name === argC)
-        )
+
+        if (argA && child.name.includes(argA) || 
+        (argB && child.name.includes(argB)) || 
+        (argC && child.name.includes(argC)))
+
         child.visible = false;
     }
-
-    
+        
 //------------------------------------------------ check if item exists
 
 
