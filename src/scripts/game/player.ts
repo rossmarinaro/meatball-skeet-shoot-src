@@ -182,7 +182,7 @@ export class Player3D extends Actor {
 
         //update
 
-        scene.events.on('update', (time: number): void => this.update(time));
+        scene.events.on('update', (time: number): Promise<void> => this.update(time));
 
       });
     }
@@ -433,6 +433,7 @@ export class Player3D extends Actor {
       new System.Process.app.ThirdDimension.Inventory3D.pickup(this.scene, equipped, pos.x, pos.y - 5, pos.z);
     }
 
+    
 
   //----------------------------------------------- swap item / weapon
 
@@ -451,11 +452,12 @@ export class Player3D extends Actor {
         });
       });
     }
+
   
   //----------------------------------------------- update on scene
 
   
-    public update(time: number): void
+    public async update(time: number): Promise<void>
     {
 
       this.health = Math.ceil(this.health);
@@ -512,7 +514,7 @@ export class Player3D extends Actor {
       const direction = this.scene.third.camera.getWorldDirection(this.raycaster.ray.direction);
 
       if (this.movement.direction !== null)
-        this.rotation.y = Math.atan2(direction.normalize().x, direction.normalize().z);
+        this.rotation.y = await this.getRotationY(direction);
 
       else if (controls.type === 'first')
         this.rotation.y = Math.atan2(direction.normalize().x, direction.normalize().z);
@@ -544,6 +546,28 @@ export class Player3D extends Actor {
         this.itemProp.visible = false;
       }
     }
+
+     //----------------------------------- player's Y rotation
+
+
+     private getRotationY(direction: ENABLE3D.THREE.Vector3): Promise<number>
+     {
+ 
+       return new Promise(res => {
+ 
+         switch(this.movement.direction)
+         {
+           case 'down': 
+             res(Math.atan2(direction.normalize().x, direction.normalize().z));
+           case 'up':
+             res(Math.atan2(-direction.normalize().x, -direction.normalize().z));
+           case 'left':
+             res(Math.atan2(direction.normalize().x, direction.normalize().z) + 45);
+           case 'right':
+             res(Math.atan2(direction.normalize().x, direction.normalize().z) - 45);
+         }
+       });
+     }
 
     //--------------------------------- destroy
 
