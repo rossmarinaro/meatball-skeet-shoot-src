@@ -214,10 +214,13 @@ export class Inventory3D {
 //------------------------------- decrement
 
 
-    public static decrement (scene: ENABLE3D.Scene3D, type: string, subject: string): void
+    public static decrement (scene: ENABLE3D.Scene3D, subject: string): void
     {
-        Inventory3D[type][subject]--; 
-        scene['player'].currentEquipped.quantity = Inventory3D[type][subject];
+        if (!Inventory3D.ammo[subject]) //weapon doesn't use ammo
+            return;
+
+        Inventory3D.ammo[subject]--; 
+        scene['player'].currentEquipped.quantity = Inventory3D.ammo[subject];
     }
 
 //---------------------------------- increment

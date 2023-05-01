@@ -153,6 +153,7 @@ export class ThirdDimension {
         scene.third.scene.clear();
         LevelManager3D.reset(scene);
         Inventory3D.reset(0);
+        Actor.idIterator = 0;
     }
     
 

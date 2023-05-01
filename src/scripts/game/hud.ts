@@ -113,7 +113,7 @@ export class HUD3D extends Phaser.Scene {
           //---------- update textA
 
 
-            if (this.textA)
+            if (this.textA && scene.timeLeft)
             {
 
               //timed game
@@ -138,11 +138,14 @@ export class HUD3D extends Phaser.Scene {
               if (SkeetShoot.getGameState())
               {
 
+                //set red tint to time format if below 10 seconds
+
                 this.textAValue.setText(scene.timeLeft);
 
                 if (
                   Number(scene.timeLeft.substr(0, 1)) === 0 && 
-                  Number(scene.timeLeft.substr(2, 1)) <= 1
+                  Number(scene.timeLeft.substr(2, 1)) === 0 &&
+                  Number(scene.timeLeft.substr(3, 1)) <= 9
                 )
                   this.textAValue.setTint(0xff0000);  
               }

@@ -42,8 +42,6 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
   private async create(): Promise<void>
   {
 
-    SkeetShoot.gameState = true;
-
     System.Process.app.game.init(this);
 
     await System.Process.app.ThirdDimension.init(this, 10, 10, -10);  
@@ -64,13 +62,23 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
     
     //spawn meatball targets
 
-    for (let i = 0; i < SkeetShoot.spawns; i++)
-      this.enemies[i] = new Meatball(this, Phaser.Math.Between(-200, 200), Phaser.Math.Between(30, 120), Phaser.Math.Between(-300, -500));
+    this.time.delayedCall(700, () => {
 
-    //format the time and decrement
+      for (let i = 0; i < SkeetShoot.spawns; i++)
+        this.enemies[i] = new Meatball(
+                              this, 
+                              Phaser.Math.Between(-200, 200), 
+                              Phaser.Math.Between(30, 120), 
+                              Phaser.Math.Between(-300, -500)
+                            );
 
-    Clock.decrementTime(this, SkeetShoot.spawns > 10 ? 30000 * 1.25 : 30000);
+      //format the time and decrement
 
+      Clock.decrementTime(this, SkeetShoot.spawns > 10 ? 30000 * 1.25 : 30000);
+
+    });
+
+    SkeetShoot.gameState = true;
   }
 
   //----------------------------
@@ -170,7 +178,6 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
     });
 
   }
-
 
 }
 

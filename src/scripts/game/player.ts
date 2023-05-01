@@ -144,33 +144,31 @@ export class Player3D extends Actor {
                 itemOrigin = this.scene.third.add.box({width: 1, height: 1, depth: 1});
                 itemOrigin.visible = false;
                                               
-                Promise.resolve().then(
-  
-                  ()=>{   
+                Promise.resolve().then(()=>{   
          
-                      const pos = new ENABLE3D.THREE.Vector3();
-  
-                      this.scene.events.on('update', ()=> {
-            
-                        i.getWorldPosition(pos);
-  
-                        itemOrigin?.position.copy(pos); 
-  
-                        if (this.itemProp !== null)
-                        {
-                          this.itemProp.position.copy(pos);
+                    const pos = new ENABLE3D.THREE.Vector3();
 
-                          if (this.hasBody)
-                            this.itemProp.rotation.y = this.rotation.y + 180
-                        }
+                    this.scene.events.on('update', ()=> {
+          
+                      i.getWorldPosition(pos);
 
-                        i.attach(itemOrigin);
+                      itemOrigin?.position.copy(pos); 
+
+                      if (this.itemProp !== null)
+                      {
+                        this.itemProp.position.copy(pos);
 
                         if (this.hasBody)
-                          this.body.needUpdate = true; 
-  
-                      });
-                  });
+                          this.itemProp.rotation.y = this.rotation.y + 230;
+                      }
+
+                      i.attach(itemOrigin);
+
+                      if (this.hasBody)
+                        this.body.needUpdate = true; 
+
+                    });
+                });
               }
             }
         });
