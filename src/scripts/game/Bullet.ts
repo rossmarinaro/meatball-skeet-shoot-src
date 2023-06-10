@@ -36,8 +36,11 @@ export class Bullet extends Actor {
   {
     
     super(src.scene, key);
+
+    if (src.scene['controller'].perspectiveControls.type === 'third') //temp hack
+      return;
     
-    (async ()=> { 
+    (async (): Promise<void> => { 
 
       this.src = src;
       this.damage = damage;

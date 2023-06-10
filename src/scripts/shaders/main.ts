@@ -182,10 +182,14 @@ export class ShaderManager {
      
         requestAnimationFrame(()=> {
 
-            scene.third.camera.updateProjectionMatrix();
-            scene.third.renderer.setSize(innerWidth, innerHeight);
-            ShaderManager.bloomComposer.setSize(innerWidth, innerHeight);
-            ShaderManager.finalComposer.setSize(innerWidth, innerHeight);
+            if (!System.Config.isDesktop(scene))
+            {
+
+                scene.third.camera.updateProjectionMatrix();
+                scene.third.renderer.setSize(innerWidth, innerHeight);
+                ShaderManager.bloomComposer.setSize(innerWidth, innerHeight);
+                ShaderManager.finalComposer.setSize(innerWidth, innerHeight);
+            }
 
             ShaderManager.update3DRenderPipeline(scene);
         });

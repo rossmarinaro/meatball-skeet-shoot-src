@@ -98,7 +98,10 @@ export class HUD3D extends Phaser.Scene {
       for (let line of Object.values(this.crossHairs))
         if (scene.controller)
           line.setVisible(scene.controller.perspectiveControls.type === 'first' ? true : false)
-              .setPosition(innerWidth / 2, innerHeight / 2);
+              .setPosition(
+                !System.Config.isDesktop(this._scene) ? innerWidth / 2 : this.cameras.main.width / 2, 
+                !System.Config.isDesktop(this._scene) ? innerHeight / 2 : this.cameras.main.height / 2
+              );
   
       //update ammo text
   
