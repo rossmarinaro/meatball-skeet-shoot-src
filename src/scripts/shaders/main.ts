@@ -180,7 +180,15 @@ export class ShaderManager {
     private static update3DRenderPipeline(scene: Scene3D): void
     {
      
-        requestAnimationFrame(()=> ShaderManager.update3DRenderPipeline(scene));
+        requestAnimationFrame(()=> {
+
+            scene.third.camera.updateProjectionMatrix();
+            scene.third.renderer.setSize(innerWidth, innerHeight);
+            ShaderManager.bloomComposer.setSize(innerWidth, innerHeight);
+            ShaderManager.finalComposer.setSize(innerWidth, innerHeight);
+
+            ShaderManager.update3DRenderPipeline(scene);
+        });
 
         const traverseObjects = (action?: boolean): void => { 
 

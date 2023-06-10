@@ -1,6 +1,7 @@
 // HUD
 
 import * as ENABLE3D from '@enable3d/phaser-extension';
+import { System } from '../internals/Config';
 import { SkeetShoot } from './main';
 
 export class HUD3D extends Phaser.Scene {
@@ -13,7 +14,10 @@ export class HUD3D extends Phaser.Scene {
       _2: Phaser.GameObjects.Rectangle
     }
 
-    private ammo: Phaser.GameObjects.Text
+    private ammo: {
+      text: Phaser.GameObjects.Text | null
+      quantity: Phaser.GameObjects.Text | null
+    }
 
     private textA: Phaser.GameObjects.Text
     private textAValue: Phaser.GameObjects.Text
@@ -37,14 +41,13 @@ export class HUD3D extends Phaser.Scene {
           _1: this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 50, 2, 0x000000),
           _2: this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 2, 50, 0x000000)
       }
+
+      this.ammo = {
+        text: null,
+        quantity: null
+      }
       
       await this.createUI(20, 'TIME LEFT: ', 'HIT: ', 'LEVEL: '); 
-
-      //listen for resize
-
-      this.scale.on('resize', ()=> this.resizeWindow(this), false);
-      screen.orientation?.addEventListener('change', ()=> this.resizeWindow(this), false);
-      screen.orientation?.addEventListener('webkitfullscreenchange', ()=> this.resizeWindow(this), false);
 
       this.initialized = true;
 
@@ -57,17 +60,17 @@ export class HUD3D extends Phaser.Scene {
     private async createUI (size: number, textA?: string, textB?: string, textC?: string): Promise<void>
     {
 
-      this.add.text(50, 10, 'AMMO: ', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ff0000").setStroke('#ffff00', 2).setShadow(2, 2, '#000000', 1, false);
-      this.ammo = this.add.text(130, 6, '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ff0000").setStroke('#ffffff', 3);
+      this.ammo.text = this.add.text(20, this.cameras.main.height - 50, 'AMMO: ', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ff0000").setStroke('#ffff00', 2).setShadow(2, 2, '#000000', 1, false);
+      this.ammo.quantity = this.add.text(110, this.cameras.main.height - 52, '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ff0000").setStroke('#ffffff', 3);
   
-      this.textA = this.add.text(50, 50, textA ? textA : '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
-      this.textAValue = this.add.text(180, 50, '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
+      this.textA = this.add.text(20, 20, textA ? textA : '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
+      this.textAValue = this.add.text(180, 20, '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
 
-      this.textB = this.add.text(50, 80, textB ? textB : '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
-      this.textBValue = this.add.text(180, 80, '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
+      this.textB = this.add.text(20, 50, textB ? textB : '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
+      this.textBValue = this.add.text(180, 50, '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
 
-      this.textC = this.add.text(50, 110, textC ? textC : '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
-      this.textCValue = this.add.text(180, 110, '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
+      this.textC = this.add.text(20, 80, textC ? textC : '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
+      this.textCValue = this.add.text(180, 80, '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false);
     }
 
 
@@ -79,35 +82,45 @@ export class HUD3D extends Phaser.Scene {
 
       let gameOver = false;
 
-      //----------- on scene update
-  
+      if (!this.initialized || (scene.player === null || !scene.player.raycaster))
+        return;
 
-          if (!this.initialized || (scene.player === null || !scene.player.raycaster))
-            return;
-
-            
-          scene.third.camera.getWorldDirection(scene.player.raycaster.ray.direction);
-              
-
-          //----------toggle perspective camera
-
-
-          for (let i of Object.values(this.crossHairs))
-            if (scene.controller)
-              i.setVisible(scene.controller.perspectiveControls.type === 'first' ? true : false);
-
+        
+      scene.third.camera.getWorldDirection(scene.player.raycaster.ray.direction);
           
-          //--------- update ammo text
 
+      //is mobile in landscape view
 
-          if (this.ammo)
-            this.ammo
-              .setText(
-                scene.player.currentEquipped.quantity >= 1 ? 
-                scene.player.currentEquipped.quantity.toString() : '0'
-              )
-              .setColor(scene.player.currentEquipped.quantity >= 1 ? "#ffffff" : "#ff0000")
-              .setStroke(scene.player.currentEquipped.quantity >= 1 ? '#000000' : '#ffffff', 3);
+      const mobileLandscape = !System.Config.isDesktop(scene) && System.Config.isLandscape(scene);
+
+      //crosshairs 
+  
+      for (let line of Object.values(this.crossHairs))
+        if (scene.controller)
+          line.setVisible(scene.controller.perspectiveControls.type === 'first' ? true : false)
+              .setPosition(innerWidth / 2, innerHeight / 2);
+  
+      //update ammo text
+  
+      if (this.ammo.text)
+        this.ammo.text
+          .setPosition(
+            mobileLandscape ? innerWidth / 2 + 90 : 100, 
+            mobileLandscape ? 10 : this.cameras.main.height - 50
+          )
+  
+      if (this.ammo.quantity)
+        this.ammo.quantity
+          .setPosition(
+            mobileLandscape ? innerWidth / 2 + 165 : 180, 
+            mobileLandscape ? 8 : this.cameras.main.height - 52
+          )
+          .setText(
+            scene.player.currentEquipped.quantity >= 1 ? 
+            scene.player.currentEquipped.quantity.toString() : '0'
+          )
+          .setColor(scene.player.currentEquipped.quantity >= 1 ? "#ffffff" : "#ff0000")
+          .setStroke(scene.player.currentEquipped.quantity >= 1 ? '#000000' : '#ffffff', 3);
 
 
           //---------- update textA
@@ -166,16 +179,5 @@ export class HUD3D extends Phaser.Scene {
 
     }
 
-  
-    private resizeWindow(scene: Phaser.Scene | ENABLE3D.Scene3D): void 
-    {
-
-      if (!scene.scene.settings.active)
-          return;
-
-        this.crossHairs._1.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 2);
-        this.crossHairs._2.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 2);
- 
-    }
 }
   
