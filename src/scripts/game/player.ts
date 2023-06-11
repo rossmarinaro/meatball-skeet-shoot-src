@@ -13,6 +13,8 @@ export class Player3D extends Actor {
     private collide: boolean
     private isSelf: boolean | undefined
     private canJump: boolean
+    private justFired: boolean
+    private isMoving: boolean
 
     public initialized: boolean = false
     public objType: string = 'player'
@@ -47,7 +49,10 @@ export class Player3D extends Actor {
         this.playerID = data ? data.id : 0;
         this.username = data ? data.username : null; 
         this.color = data && data.skin ? data.skin : 'red';
+
         this.alive = true;
+        this.justFired = false;
+        this.isMoving = false; 
         this.collide = false;                
         this.canJump = false;
   
@@ -205,6 +210,7 @@ export class Player3D extends Actor {
 
     public defaultStance(time: number, joystick1: any, keys: any, leftStick: any): void
     {
+
       if (
         (keys && keys.w.isDown) || 
         (joystick1 && joystick1.forceY < -40) || 
@@ -223,6 +229,7 @@ export class Player3D extends Actor {
       }
     }
 
+
   //--------------------------------------------------- player crouch
 
 
@@ -238,6 +245,7 @@ export class Player3D extends Actor {
 
     }
   
+
   //--------------------------------------------------- player idle
 
     
@@ -248,6 +256,8 @@ export class Player3D extends Actor {
         this.currentEquipped.key === 'rolling_pin1' ? 
         'idle' : 'Rifle Idle'
       );
+
+      this.isMoving = false;
 
       if (this.isSelf === true && this.rigidBody.body)
       {
@@ -290,6 +300,11 @@ export class Player3D extends Actor {
 
       if (!this.alive /* || System.Process.app.multiPlayer.chat === true */ || !this.raycaster)
         return; 
+
+      this.justFired = false;
+      
+      if (this.scene['controller'].perspectiveControls.type === 'third')
+        this.isMoving = true;
 
       const cam = this.scene.third.camera,
             direction = cam.getWorldDirection(this.raycaster.ray.direction),
@@ -356,8 +371,10 @@ export class Player3D extends Actor {
     public async attack(): Promise<void>
     {
 
-      if (!this.alive)
+      if (!this.alive || !this.currentEquipped.obj || this.isMoving)
         return;
+
+      this.justFired = true;
         
       const getCurrentItem = async () => {
 
@@ -466,72 +483,72 @@ export class Player3D extends Actor {
         const pos = new ENABLE3D.THREE.Vector3, 
               movementY = (num: number) => { return num - this.movement.y };
 
-      this.raycaster = new ENABLE3D.THREE.Raycaster;
+        this.raycaster = new ENABLE3D.THREE.Raycaster;
 
-      this.raycaster.setFromCamera(
-        { 
-          x: 0.6 - this.movement.x, 
-          y: System.Config.isPortrait(this.scene) || System.Config.isDesktop(this.scene) ? movementY(-0.8) : movementY(-0.5) 
-        }, this.scene.third.camera
-      ); 
+        this.raycaster.setFromCamera(
+          { 
+            x: 0.6 - this.movement.x, 
+            y: System.Config.isPortrait(this.scene) || System.Config.isDesktop(this.scene) ? movementY(-0.8) : movementY(-0.5) 
+          }, this.scene.third.camera
+        ); 
 
-      this.raycaster.ray.origin.copy(this.scene.third.camera.position);
+        this.raycaster.ray.origin.copy(this.scene.third.camera.position);
 
-      pos.copy(this.raycaster.ray.direction);
-      pos.multiplyScalar(0.8 + this.movement.z);
-      pos.add(this.raycaster.ray.origin);
+        pos.copy(this.raycaster.ray.direction);
+        pos.multiplyScalar(0.8 + this.movement.z);
+        pos.add(this.raycaster.ray.origin);
 
-      //swap player fp weapon perspective view
+        //swap player fp weapon perspective view
 
-      const controls = this.scene['controller'].perspectiveControls;
+        const controls = this.scene['controller'].perspectiveControls;
 
-      if (this.currentEquipped.obj)
-      {
-        if (this.alive === true && this.itemProp)
+        if (this.currentEquipped.obj)
         {
-          if (controls.type === 'first')
+          if (this.alive === true && this.itemProp)
           {
-            this.currentEquipped.obj.visible = true;
-            this.itemProp.visible = false;
-            this.visible = false;
-          } 
-          else
-          {
-            this.currentEquipped.obj.visible = false;
-            this.itemProp.visible = true;
-            this.visible = true;
+            if (controls.type === 'first')
+            {
+              this.currentEquipped.obj.visible = true;
+              this.itemProp.visible = false;
+              this.visible = false;
+            } 
+            else
+            {
+              this.currentEquipped.obj.visible = false;
+              this.itemProp.visible = true;
+              this.visible = true;
+            }
           }
+
+          this.currentEquipped.obj.position.copy(pos);
+          this.currentEquipped.obj.rotation.copy(this.scene.third.camera.rotation);   
         }
 
-        this.currentEquipped.obj.position.copy(pos);
-        this.currentEquipped.obj.rotation.copy(this.scene.third.camera.rotation);   
-      }
+        //set rotation when moving
 
-      //set rotation when moving
+        const direction = this.scene.third.camera.getWorldDirection(this.raycaster.ray.direction);
 
-      const direction = this.scene.third.camera.getWorldDirection(this.raycaster.ray.direction);
+        if (this.movement.direction !== null)
+          this.rotation.y = await this.getRotationY(direction);
 
-      if (this.movement.direction !== null)
-        this.rotation.y = await this.getRotationY(direction);
-
-      else if (controls.type === 'first')
-        this.rotation.y = Math.atan2(direction.normalize().x, direction.normalize().z);
-      
-      //copy player's skin position to its physics body
-
-      this.position.copy(this.rigidBody.position);
-
-      this.rigidBody.body.needUpdate = true;
-      
-      this.rigidBody.body.on.collision(otherObject => {
-
-        if (!otherObject.name.includes('bh_model'))
-          this.canJump = true; 
-      });  
-
+        else if (controls.type === 'first' || this.justFired)
+          this.rotation.y = Math.atan2(direction.normalize().x, direction.normalize().z);
         
-        if (this.collide && this.body.velocity.y <= 0)
-          this.canJump = true;
+        //copy player's skin position to its physics body
+
+        this.position.copy(this.rigidBody.position);
+
+        this.rigidBody.body.needUpdate = true;
+        
+        this.rigidBody.body.on.collision(otherObject => {
+
+          if (!otherObject.name.includes('bh_model'))
+            this.canJump = true; 
+        });  
+
+          
+          if (this.collide && this.body.velocity.y <= 0)
+            this.canJump = true;
 
       }
 
@@ -567,13 +584,18 @@ export class Player3D extends Actor {
        });
      }
 
+
     //--------------------------------- destroy
+
 
     public destroy(): void
     {
+      
       this.alive = false;
+
       this.dropItem(this.currentEquipped.key);
       this.remove(this.children[0]);    
+
       if (this.hasBody === true && this.body)
         this.scene.third.destroy(this);
     }
