@@ -14,7 +14,6 @@ export class Player3D extends Actor {
     private isSelf: boolean | undefined
     private canJump: boolean
     private justFired: boolean
-    private isMoving: boolean
 
     public initialized: boolean = false
     public objType: string = 'player'
@@ -52,7 +51,6 @@ export class Player3D extends Actor {
 
         this.alive = true;
         this.justFired = false;
-        this.isMoving = false; 
         this.collide = false;                
         this.canJump = false;
   
@@ -257,8 +255,6 @@ export class Player3D extends Actor {
         'idle' : 'Rifle Idle'
       );
 
-      this.isMoving = false;
-
       if (this.isSelf === true && this.rigidBody.body)
       {
 
@@ -302,9 +298,6 @@ export class Player3D extends Actor {
         return; 
 
       this.justFired = false;
-      
-      if (this.scene['controller'].perspectiveControls.type === 'third')
-        this.isMoving = true;
 
       const cam = this.scene.third.camera,
             direction = cam.getWorldDirection(this.raycaster.ray.direction),
@@ -371,7 +364,11 @@ export class Player3D extends Actor {
     public async attack(): Promise<void>
     {
 
-      if (!this.alive || !this.currentEquipped.obj || this.isMoving)
+      if (
+        !this.alive || 
+        !this.currentEquipped.obj || 
+        (this.scene['controller'].perspectiveControls.type === 'third' && this.movement.direction === 'up')
+      )
         return;
 
       this.justFired = true;
@@ -500,13 +497,19 @@ export class Player3D extends Actor {
 
         //swap player fp weapon perspective view
 
-        const controls = this.scene['controller'].perspectiveControls;
+        const controls = this.scene['controller'];
 
         if (this.currentEquipped.obj)
         {
           if (this.alive === true && this.itemProp)
           {
-            if (controls.type === 'first')
+
+            this.itemProp.traverse((i: ENABLE3D.ExtendedObject3D) => {
+              if (i.name.includes('muzzle') && !controls.isFiring)
+                i.visible = false;
+            });
+
+            if (controls.perspectiveControls.type === 'first')
             {
               this.currentEquipped.obj.visible = true;
               this.itemProp.visible = false;
@@ -531,7 +534,7 @@ export class Player3D extends Actor {
         if (this.movement.direction !== null)
           this.rotation.y = await this.getRotationY(direction);
 
-        else if (controls.type === 'first' || this.justFired)
+        else if (controls.perspectiveControls.type === 'first' || this.justFired)
           this.rotation.y = Math.atan2(direction.normalize().x, direction.normalize().z);
         
         //copy player's skin position to its physics body

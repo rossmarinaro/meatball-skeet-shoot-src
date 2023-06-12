@@ -179,10 +179,13 @@ export class ShaderManager {
 
     private static update3DRenderPipeline(scene: Scene3D): void
     {
+
+        if (!scene.third)
+            return;
      
         requestAnimationFrame(()=> {
 
-            if (!System.Config.isDesktop(scene))
+            if (!System.Config.isDesktop(scene) && scene.third)
             {
 
                 scene.third.camera.updateProjectionMatrix();
@@ -196,7 +199,7 @@ export class ShaderManager {
 
         const traverseObjects = (action?: boolean): void => { 
 
-            if (ShaderManager.objectSelection !== null)
+            if (ShaderManager.objectSelection !== null && scene.third)
 
                 scene.third.scene.traverse((obj: any) => { 
 
