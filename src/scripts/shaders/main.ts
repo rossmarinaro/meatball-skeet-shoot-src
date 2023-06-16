@@ -5,7 +5,9 @@ import { Scene3D, THREE } from '@enable3d/phaser-extension';
 import { EffectComposer, RenderPass, ShaderPass } from '@enable3d/phaser-extension';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
+
 export class ShaderManager {
+
 
     private static bloomComposer: EffectComposer
     private static finalComposer: EffectComposer
@@ -85,7 +87,6 @@ export class ShaderManager {
     }): THREE.ShaderMaterial
     {
 
-
         //BLEND MODES: AdditiveBlending, SubtractiveBlending, MultiplyBlending, NormalBlending, NoBlending
 
         const shader = new THREE.ShaderMaterial({
@@ -124,7 +125,7 @@ export class ShaderManager {
 
         ShaderManager.renderPass = new RenderPass(scene.third.scene, scene.third.camera),
         ShaderManager.bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 1.5, 0.4, 0.85);
-       
+
         ShaderManager.bloomPass.threshold = params.bloomThreshold;
         ShaderManager.bloomPass.strength = params.bloomStrength;
         ShaderManager.bloomPass.radius = params.bloomRadius;
@@ -180,14 +181,13 @@ export class ShaderManager {
     private static update3DRenderPipeline(scene: Scene3D): void
     {
 
-        if (!scene.third)
+        if (!System.Process.app.game.gameState || !scene.third)
             return;
-     
+
         requestAnimationFrame(()=> {
 
             if (!System.Config.isDesktop(scene) && scene.third)
             {
-
                 scene.third.camera.updateProjectionMatrix();
                 scene.third.renderer.setSize(innerWidth, innerHeight);
                 ShaderManager.bloomComposer.setSize(innerWidth, innerHeight);
@@ -224,9 +224,6 @@ export class ShaderManager {
                 });
         }
 
-        if (!ShaderManager.postProcessing)
-            return;
-
         if (ShaderManager.objectSelection !== null)
         {
 
@@ -245,13 +242,19 @@ export class ShaderManager {
             return;
         }
 
+        if (!ShaderManager.postProcessing)
+            return;
+
 
         //apply render passes to entire scene
 
-        ShaderManager.bloomPass.strength = 0.5;
+        ShaderManager.bloomPass.strength = 0.25;
 
         ShaderManager.bloomComposer.render();
         ShaderManager.finalComposer.render();
+
+
+
 
     }
     

@@ -32,7 +32,7 @@ export class Lighting {
 
     Lighting.dirlight.castShadow = true;
     Lighting.dirlight.shadow.bias = -0.001;
-    Lighting.dirlight.shadow.mapSize.width = 5000;
+    Lighting.dirlight.shadow.mapSize.width = 5048;
     Lighting.dirlight.shadow.mapSize.height = 350;
     Lighting.dirlight.shadow.camera.near = 500;
     Lighting.dirlight.shadow.camera.far = 500;
@@ -48,7 +48,6 @@ export class Lighting {
     this.scene.third.add.existing(Lighting.amblight);
 
     this.scene.events.on('update', ()=> {
-
       if (Lighting.amblight)
       {
         let scale = Math.random() * 3;
@@ -67,11 +66,14 @@ export class Lighting {
 
   //------------------------- set creepy
 
-  public static setCreepyLighting(scene: ENABLE3D.Scene3D): void
+  public static setCreepyLighting(scene: ENABLE3D.Scene3D, posY?: number): void
   {
+    
     const player = scene['player'].position;
 
-    System.Process.app.ThirdDimension.Lighting.setDirectionalLight(new ENABLE3D.THREE.Vector3(player.x, -10, player.z));
+    posY = posY ? posY : player.y - 10;
+
+    System.Process.app.ThirdDimension.Lighting.setDirectionalLight(new ENABLE3D.THREE.Vector3(player.x, posY, player.z));
   }
 }
 

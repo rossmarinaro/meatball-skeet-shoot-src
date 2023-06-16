@@ -22,7 +22,7 @@ export class EventManager {
     public static triggerPaywall(currentScene: Phaser.Scene, sceneToContinue: Phaser.Scene): void
     {
         //System.Process.app.account.paid === true ? 
-            System.Process.app.events.ee.emit('game', sceneToContinue) //:
+            System.Process.app.events.ee?.emit('game', sceneToContinue) //:
            // currentScene.scene.run('Modal', [currentScene, 'generic', 'paywall']);
     }
 
@@ -66,7 +66,7 @@ export class EventManager {
     public static socketErrorHandler (err: any): boolean
     {
         console.log('socket error: ', err);
-        System.Process.app.ui.displayMessage(`OOF! NETWORK ERROR: ${err}`, true, true);
+        //System.Process.app.ui.displayMessage(`OOF! NETWORK ERROR: ${err}`, true, true);
         
         return false;
     }
@@ -102,7 +102,7 @@ export class EventManager {
             System.Process.app.events.socketClose(scene['connection']); 
 
         System.Process.app.game.gameState = false;
-        System.Process.app.events.ee.emit('exit');
+        System.Process.app.events.ee?.emit('exit');
     }
 
 
@@ -170,9 +170,9 @@ export class EventManager {
 
         // refresh stale data, restart intro scene
 
-            const data = await System.Process.app.refreshApp();
+          //  const data = await System.Process.app.refreshApp();
 
-            EventManager.scene.scene.run('Intro', data);
+          //  EventManager.scene.scene.run('Intro', data);
      
             EventManager.scene.scene.stop('PauseMenu');
             EventManager.scene.scene.stop('Menu3D'); 
@@ -182,23 +182,23 @@ export class EventManager {
             
             if (bool === true)
             {
-                System.Process.app.gfx.setAlpha(0.8);
+              //  System.Process.app.gfx.setAlpha(0.8);
                 EventManager.scene.scene.run('PauseMenu', EventManager.scene);
                 EventManager.scene.scene.stop('SamplerUI'); 
                 EventManager.scene.scene.stop('BassUI');
                 EventManager.scene.scene.stop('SaveMenu');
 
-                if (System.Process.app.multiPlayer.isPlaying === true)
-                {
-                    EventManager.scene.scene.pause('Chat');
-                    EventManager.scene.scene.pause('Brawl');
-                }
-                else 
-                {
-                    EventManager.scene.scene.pause('Quest');
-                    EventManager.scene.scene.pause('SeaShell_MiniGame');
-                    EventManager.scene.scene.pause('Bubble_MiniGame');
-                }
+                // if (System.Process.app.multiPlayer.isPlaying === true)
+                // {
+                //     EventManager.scene.scene.pause('Chat');
+                //     EventManager.scene.scene.pause('Brawl');
+                // }
+                // else 
+                // {
+                //     EventManager.scene.scene.pause('Quest');
+                //     EventManager.scene.scene.pause('SeaShell_MiniGame');
+                //     EventManager.scene.scene.pause('Bubble_MiniGame');
+                // }
             }
         })
     
@@ -206,22 +206,22 @@ export class EventManager {
 
             EventManager.scene.scene.get('Controller')['_inputs'].pauseMenu.isPaused = false;
 
-            System.Process.app.gfx.setAlpha(0);
+            // System.Process.app.gfx.setAlpha(0);
 
-            if (System.Process.app.multiPlayer.isPlaying === true)
-            {
-                EventManager.scene.scene.resume('Brawl')
-                EventManager.scene.scene.resume('Chat');
-            } 
-            else 
-            {
-                EventManager.scene.scene.resume('Quest');
-                EventManager.scene.scene.resume('SeaShell_MiniGame');
-                EventManager.scene.scene.resume('Bubble_MiniGame');
-            }
-            EventManager.scene.scene.launch('TextUI');
-            EventManager.scene.scene.stop('PauseMenu');
-            EventManager.scene.scene.stop('WarpMenu');
+            // if (System.Process.app.multiPlayer.isPlaying === true)
+            // {
+            //     EventManager.scene.scene.resume('Brawl')
+            //     EventManager.scene.scene.resume('Chat');
+            // } 
+            // else 
+            // {
+            //     EventManager.scene.scene.resume('Quest');
+            //     EventManager.scene.scene.resume('SeaShell_MiniGame');
+            //     EventManager.scene.scene.resume('Bubble_MiniGame');
+            // }
+            // EventManager.scene.scene.launch('TextUI');
+            // EventManager.scene.scene.stop('PauseMenu');
+            // EventManager.scene.scene.stop('WarpMenu');
         })
 
         .on('controller', ()=>{ 
@@ -277,7 +277,7 @@ export class EventManager {
                     if(progress > .9 )
                     {
                     
-                    await System.Process.app.spawner.setSpawnPoint(level); 
+                   // await System.Process.app.spawner.setSpawnPoint(level); 
 
                     EventManager.scene.sound.stopAll(); 
                     EventManager.scene.sound.removeAll();

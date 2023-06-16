@@ -1,42 +1,44 @@
 
+import * as ENABLE3D from '@enable3d/phaser-extension';
+import { Actor } from './Actor'
 import { System } from '../internals/Config';
-import { THREE, ExtendedObject3D, Scene3D } from '@enable3d/phaser-extension';
 
 
+export class Pickup3D extends Actor {
 
-//------------------------------------------------------------------------- RIFLE
 
-export class Pickup extends ExtendedObject3D {
+  public _id?: number | string | undefined
 
-  private scene: Scene3D
+  constructor ( 
 
-    constructor(scene: Scene3D, type: string)
-    {
-      super();
-      this.scene = scene;
-      this.name = type;
-     
-      this.scene.third.load.gltf(type).then((gltf: any) => this._init(gltf));
-    
-    }
-    private _init(gltf: any): void
-    {
+    scene: ENABLE3D.Scene3D, 
+    key: string, 
+    x: number, 
+    y: number, 
+    z: number, 
+    _id?: number | string | undefined 
 
-      this.add(gltf.scene);
+  )
+  {
+    super(scene, key, x, y, z, true, true, () => {
+
+      //spin pickup
   
-      this.scene.third.add.existing(this, {collisionFlags: 6});
-  
-      this.traverse((child: any) => {
-  
-        if (child.isMesh)
-        {
-          child.castShadow = child.receiveShadow = true;
-          if (child.material)
+      this.scene.events.on('update', ()=> {
+          if (this.hasBody)
           {
-            child.material.metalness = 0.3;
-            child.material.roughness = 0.3;
+            this.rotation.y += 0.03;
+            this.body.needUpdate = true;
           }
-        }
       });
-    }
+  
+      //set as standalone item
+  
+        this.traverse((i: any) => System.Process.app.ThirdDimension.Inventory3D.setAsStandAloneItem(this, i));
+        this.scene.third.physics.add.existing(this, {shape: 'sphere', radius: 3, collisionFlags: 6});
+    });
+
+    this._id = _id;   
+  }
+
 }

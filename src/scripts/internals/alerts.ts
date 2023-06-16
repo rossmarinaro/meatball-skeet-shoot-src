@@ -29,8 +29,8 @@ export class Alerts extends Phaser.Scene {
       const x = this.GAME_WIDTH / 2 - 120,
             y = this.GAME_HEIGHT / 2 - 250;
 
-      this.popUpSmall = this.add.text(x, y, '', { fontSize: "1.5rem", fontFamily: "Bangers" }).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false).setVisible(false);
-      this.popUpLarge = this.add.text(x, y, '', { fontSize: "1.7rem", fontFamily: "Digitizer" }).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false)//.setVisible(false);
+      this.popUpSmall = this.add.text(x, y, '', { fontSize: "1.5rem", fontFamily: "Bangers" }).setColor("#ffff00").setStroke('#ff0000', 4).setShadow(2, 2, '#000000', 1, false).setVisible(false);
+      this.popUpLarge = this.add.text(x, y, '', { fontSize: "1.7rem", fontFamily: "Digitizer" }).setColor("#ffff00").setStroke('#ff0000', 4).setShadow(2, 2, '#000000', 1, false);
 
       this.optionalText = this.add.text(this.GAME_WIDTH / 2 - 65, this.GAME_HEIGHT / 2 - 180, '', {fontSize: "20px", fontFamily: "Digitizer"}).setColor("#ffff00").setStroke('#000000', 4).setShadow(2, 2, '#000000', 1, false).setVisible(false);
       this.optionalTween = this.tweens.add({targets: this.optionalText, alpha: 0, duration: 500, ease: 'Sine.easeOut', repeat: -1, yoyo: true, yoyoDelay: 500});

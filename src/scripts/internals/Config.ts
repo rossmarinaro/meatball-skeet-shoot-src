@@ -1,5 +1,6 @@
 import * as ENABLE3D  from '@enable3d/phaser-extension';
 
+import Application from './Application';
 import { orientation } from '../../../typings/types';
 import { Canvas }  from '@enable3d/phaser-extension';
 import Utils from '../internals/Utils';
@@ -15,7 +16,7 @@ export namespace System {
         public static utils: typeof Utils = Utils
 
         public game: Readonly<Phaser.Game>
-        public app: any
+        public app: Application
         public utils: any
         public parent: string
         public proxyConnection: string | null
@@ -90,7 +91,6 @@ export namespace System {
         {
             
             this.Canvas = {...Canvas({ antialias: true })};
-            this.app = null; 
             this.parent = 'game';
             this.key = '';
             this.utils = null;
@@ -149,6 +149,11 @@ export namespace System {
                 this.velY = 26;
            
             }
+
+            
+            //------ ENABLE 3D INIT
+                
+            ENABLE3D.enable3d(() => this.game = new Phaser.Game(<any>this.app)).withPhysics('assets/wasm');
         }  
     
     

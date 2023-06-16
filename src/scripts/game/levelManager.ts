@@ -7,7 +7,7 @@ import { Actor } from './Actor';
 
 export class LevelManager3D {
 
-  private static currentLevel: string = ''
+  public static currentLevel: string = ''
   
   public static level: Actor
   public static bounds: { left: number, right: number, top: number, bottom: number } | null 
@@ -25,7 +25,7 @@ export class LevelManager3D {
 
     switch (LevelManager3D.currentLevel)
     {
-      case 'room': Room(scene); break;
+      case 'range': Room(scene); break;
 
     }
 

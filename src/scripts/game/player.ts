@@ -458,8 +458,12 @@ export class Player3D extends Actor {
       this.currentEquipped.key = data.item.key;
       this.itemProp = new Actor(this.scene, data.item.key, 0, 0, 0, true, false, () => {
         this.itemProp?.traverse((i: any): void => {
+
           this.scene.third.add.existing(this.itemProp);
-          System.Process.app.ThirdDimension.Inventory3D.setItemForThirdPerson(this.itemProp, i);
+          
+          if (this.itemProp)
+            System.Process.app.ThirdDimension.Inventory3D.setItemForThirdPerson(this.itemProp, i);
+            
           this.idle();
         });
       });

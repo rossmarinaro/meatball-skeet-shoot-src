@@ -1,10 +1,9 @@
-
-
 //3D
 
 import * as ENABLE3D from '@enable3d/phaser-extension';
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
-import { System } from './Config';
+
+import { System } from '../internals/Config';
 
 import { Inventory3D } from '../game/inventory/inventoryManager';
 import { Player3D } from '../game/player';
@@ -12,18 +11,34 @@ import { Particles3D } from '../game/particles3d';
 import { HUD3D } from '../game/hud';
 import { Controller3D } from '../game/controller';
 import { LevelManager3D } from '../game/levelManager';
-import { Lighting } from '../game/lighting';
+import { Lighting } from '../game/lighting'; 
 import { Actor } from '../game/Actor';
 
 
 export class ThirdDimension {
 
-    private static debugGraphics: boolean
+    private static debugGraphics: boolean 
     private static backgroundFill: Phaser.GameObjects.Graphics
+
     public static debugParams: boolean
 
-    public static cache: { key: string, data: any }[] = []
-    
+    //object cache
+
+    public static cache: { 
+
+        base: string[], 
+        preload: string[], 
+        current: { key: string, data: any }[] 
+    } = { 
+        base: [ 
+            'bullet_3d',
+            'automac1000',
+            'bh_model'
+        ], 
+        preload: [], 
+        current: [] 
+    }
+
     public static Player3D: typeof Player3D = Player3D
     public static Particles3D: typeof Particles3D = Particles3D
     public static Inventory3D: typeof Inventory3D = Inventory3D
@@ -39,9 +54,9 @@ export class ThirdDimension {
     //--------------------- init third dimension
 
 
-    public static async init (scene: ENABLE3D.Scene3D, camPosX: number, camPosY: number, camPosZ: number): Promise<void>  
+    public static async init (scene: ENABLE3D.Scene3D, camPos: ENABLE3D.THREE.Vector3, assetsToLoad?: string[]): Promise<void>  
     {
-
+        
         return new Promise(async res => {
         
             scene.data['items'] = [];
@@ -49,17 +64,26 @@ export class ThirdDimension {
             scene.data['weapons'] = [];
     
             scene['controller'] = new Controller3D(scene);
-      
+
+            //load base cache
+
+            ThirdDimension.cache.preload.push(...ThirdDimension.cache.base);
+
+            //load on demand 
+
+            if (assetsToLoad && assetsToLoad.length > 0)
+                ThirdDimension.cache.preload.push(...assetsToLoad);
+            
+           
             System.Process.orientation.unlock();
     
-            System.Config.makeTransparantBackground(scene['__scene']);
+            System.Config.makeTransparantBackground(scene['_scene']);
 
-            scene.clearThirdDimension();
             scene.accessThirdDimension({ maxSubSteps: 10, fixedTimeStep: 1 / 180 });  
             
         //default camera position
                 
-            scene.third.camera.position.set(camPosX, camPosY, camPosZ);  
+            scene.third.camera.position.set(camPos.x, camPos.y, camPos.z);  
     
             ThirdDimension.debugGraphics = true;
             ThirdDimension.debugParams = true;
@@ -74,14 +98,75 @@ export class ThirdDimension {
                 window['renderer'] = scene.third.renderer.info;
             }
 
+            //run HUD scene in parallel
     
             ThirdDimension.backgroundFill = scene.add.graphics({fillStyle: {color: 0x000000}}).fillRectShape(new Phaser.Geom.Rectangle(0, 0, 30000, 30000));
 
-            //init hud display /run scene in parallel
-
             scene.scene.launch('HUD3D', scene);
+            scene.scene.launch('Alerts', scene);
 
             res();
+        });
+    }
+
+        
+    //----------------------------------------------- 3d
+
+
+    private static async loadAssets (scene: Phaser.Scene, scene3d: ENABLE3D.Scene3D): Promise<void> 
+    {
+        
+        return new Promise(async res => { 
+
+            ENABLE3D.THREE.Cache.enabled = true;
+
+            const alerts = scene.scene.get('Alerts');
+
+        //skip preload if items are cached
+
+            if (ThirdDimension.cache.current.length > 0) 
+            {
+                res(); 
+                return;
+            } 
+
+            System.Process.orientation.lock('portrait-primary');
+            alerts['alert']('large', 'Loading assets...', 'please wait');
+     
+            let numAssets = 0;
+
+            const resources = await System.Process.app.resource.parser(scene3d, scene.cache.json.get('resources_3d'));
+        
+            resources['assets'].map((resource: any) => {
+
+                System.Process.app.ThirdDimension.cache.preload.filter(async (preloaded: string) => {
+
+                    const key = String(Object.keys(resource)[0]),
+                          path = String(Object.values(resource)[0]),
+                          filetype = System.Config.utils.strings.getFileType(path);  
+
+                //preload only assets used on this scene
+ 
+                    if (preloaded === key)
+                    {
+                        switch (filetype)
+                        { 
+                            case 'glb': await scene3d.third.load.gltf(key).then(data => System.Process.app.ThirdDimension.cache.current.push({ key: key, data })); break;
+                            case 'fbx': await scene3d.third.load.fbx(key).then(data => System.Process.app.ThirdDimension.cache.current.push({ key: key, data })); break;
+                        }
+        
+                        numAssets++;
+
+                        if(numAssets >= System.Process.app.ThirdDimension.cache.preload.length)
+                        {
+                            System.Process.orientation.unlock();
+                            setTimeout(()=> res(alerts['stopAlerts']()), 1000);
+                        }
+            
+                    }
+                });
+            });
+    
         });
     }
 
@@ -89,16 +174,16 @@ export class ThirdDimension {
     //------------------------------ create map, player, controller, HUD
 
 
-    public static async create(scene: ENABLE3D.Scene3D, levelKey: string, playerParams: any[]): Promise<void>  
+    public static async create(scene: ENABLE3D.Scene3D, levelKey: string, playerParams?: any[]): Promise<void>  
     {
  
         return new Promise(async res => {
 
             scene.third.camera.lookAt(-10, 10, 10);
             
-        //preload assets 
-
-            await scene.scene.get('Preload')['loadAssets'](scene['__scene'], scene); 
+        //preload assets if cached object array is empty
+           
+            await ThirdDimension.loadAssets(scene['_scene'], scene);  
 
            ThirdDimension.backgroundFill.destroy();
             
@@ -106,37 +191,27 @@ export class ThirdDimension {
             
             await LevelManager3D.load(scene, levelKey);
 
-            const hud = scene.scene.get('HUD3D');
+            if (playerParams)
+            {
 
-        //init player
+            //init player
 
-            scene['player'] = new Player3D(scene, playerParams[0], playerParams[1], playerParams[2], playerParams[3], playerParams[4]);  
+                scene['player'] = new Player3D(scene, playerParams[0], playerParams[1], playerParams[2], playerParams[3], playerParams[4]);  
 
-        //init controls
+            //init controls
 
-            scene['controller'].init(scene['player']);
+                scene['controller'].init(scene['player']);
 
-            hud['_init']();
+                ThirdDimension.update(scene);
+            } 
+
+        //init hud display
+
+            scene.scene.get('HUD3D')['initDisplay'](scene);
 
         //set post processing pipeline
 
             System.Process.app.shaders.setPostProcessingBloom(scene, { bloomStrength: 0.5, bloomThreshold: 0, bloomRadius: 0.5 });
-
-            scene.events.on('update', (time: number): void => {
-
-                //update HUD
-
-                hud['runUpdate'](scene);
-
-        //update shaders
-
-                System.Process.app.shaders.shaderMaterials.filter((shader: ENABLE3D.THREE.ShaderMaterial) => {
-                    
-                    if (shader.uniforms.time)
-                        shader.uniforms.time.value += 0.01;
-                });
-
-            }); 
 
             scene.cameras.main.fadeIn(4000, 0, 0, 0);
 
@@ -145,29 +220,93 @@ export class ThirdDimension {
         
     }
 
+    
+    //----------------------- update
+
+
+    public static update(scene: ENABLE3D.Scene3D): void
+    {
+        //log collisions
+
+        // this.third.physics.collisionEvents.on('collision', data => {
+        //   const { bodies, event } = data
+        //   console.log(bodies[0].name, bodies[1].name, event)
+        // });
+
+    //run scene3d update
+
+        scene.events.on('update', (): void => {
+            
+        //update HUD
+
+            scene.scene.get('HUD3D')['runUpdate']();
+
+        //update shaders
+
+            System.Process.app.shaders.shaderMaterials.filter((shader: ENABLE3D.THREE.ShaderMaterial) => {
+                
+                if (shader.uniforms.time)
+                    shader.uniforms.time.value += 0.01;
+            });
+
+        });
+    }
+
+
     //----------------------------- soft reset
 
 
-    public static reset(scene: ENABLE3D.Scene3D): void
+    public static async reset(scene: ENABLE3D.Scene3D): Promise<void>
     {
-        scene.third.scene.clear();
-        LevelManager3D.reset(scene);
-        Inventory3D.reset(0);
-        Actor.idIterator = 0;
+
+        return new Promise(res => {
+
+            scene.sound.stopAll(); 
+            scene.sound.removeAll();
+
+            scene.scene.stop('HUD3D'); 
+            scene.scene.stop('Alerts');
+            scene.scene.stop('Modal');
+
+            scene.third.scene.clear();
+
+            System.Process.app.shaders.postProcessing = false;
+
+            ThirdDimension.cache.preload = []; 
+
+            LevelManager3D.reset(scene);
+            Inventory3D.reset(0);
+
+            Actor.idIterator = 0;
+            
+
+            res();
+        });
     }
-    
 
 
     //----------------------------------- destroy objects and third dimension
 
 
-    public static shutDown(scene: ENABLE3D.Scene3D): void
+    public static async shutDown(scene: ENABLE3D.Scene3D): Promise<void>
     {
 
-        ThirdDimension.reset(scene);
-        scene.clearThirdDimension();
-        ThirdDimension.cache = [];
+        await ThirdDimension.reset(scene);
 
+        ThirdDimension.cache.current = [];
+        
+        if (scene.third['factories'])
+            scene.third['factories'].scene.children.map((child: ENABLE3D.ExtendedObject3D) => scene.third.scene.remove(child));
+
+        scene.clearThirdDimension();
+
+        scene.scene.stop('Sandbox3D');
+        scene.scene.stop('SkeetShoot');
+        scene.scene.stop('TheOven3D');
+        scene.scene.stop('Nexus3D');
+        scene.scene.stop('Freezer3D');
+        scene.scene.stop('HUD3D'); 
+        scene.scene.stop('Alerts');
     }
 
 
@@ -183,7 +322,8 @@ export class ThirdDimension {
                 false : true;
 
             ThirdDimension.debugGraphics ? 
-                scene.third.physics.debug?.disable() : scene.third.physics.debug?.enable();
+                scene.third.physics.debug?.disable() : 
+                scene.third.physics.debug?.enable();
         });
     }
 
@@ -193,7 +333,12 @@ export class ThirdDimension {
     
     public static toggleDebugParams(scene: ENABLE3D.Scene3D): void
     {
-        scene.input.keyboard.on('keydown-H', () => ThirdDimension.debugParams = ThirdDimension.debugParams ? false : true);
+
+        scene.input.keyboard.on('keydown-H', () => {
+
+            ThirdDimension.debugParams = ThirdDimension.debugParams ?   
+                false : true
+        });
     }
 
 }

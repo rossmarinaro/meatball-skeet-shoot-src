@@ -1,3 +1,4 @@
+
 // HUD
 
 import * as ENABLE3D from '@enable3d/phaser-extension';
@@ -33,9 +34,10 @@ export class HUD3D extends Phaser.Scene {
       super('HUD3D');
     }
 
-    public async _init(): Promise<void>
+    public async initDisplay(scene: ENABLE3D.Scene3D): Promise<void>
     {
 
+      this._scene = scene;
           
       this.crossHairs = {
           _1: this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 50, 2, 0x000000),
@@ -77,27 +79,27 @@ export class HUD3D extends Phaser.Scene {
     //------------------------------------- update
 
  
-    public runUpdate(scene: any): void
+    public runUpdate(): void
     {
 
       let gameOver = false;
 
-      if (!this.initialized || (scene.player === null || !scene.player.raycaster))
+      if (!this.initialized || (!this._scene.player || this._scene.player === null || !this._scene.player.raycaster))
         return;
 
         
-      scene.third.camera.getWorldDirection(scene.player.raycaster.ray.direction);
+      this._scene.third.camera.getWorldDirection(this._scene.player.raycaster.ray.direction);
           
 
       //is mobile in landscape view
 
-      const mobileLandscape = !System.Config.isDesktop(scene) && System.Config.isLandscape(scene);
+      const mobileLandscape = !System.Config.isDesktop(this._scene) && System.Config.isLandscape(this._scene);
 
       //crosshairs 
   
       for (let line of Object.values(this.crossHairs))
-        if (scene.controller)
-          line.setVisible(scene.controller.perspectiveControls.type === 'first' ? true : false)
+        if (this._scene.controller)
+          line.setVisible(this._scene.controller.perspectiveControls.type === 'first' ? true : false)
               .setPosition(
                 !System.Config.isDesktop(this._scene) ? innerWidth / 2 : this.cameras.main.width / 2, 
                 !System.Config.isDesktop(this._scene) ? innerHeight / 2 : this.cameras.main.height / 2
@@ -119,17 +121,17 @@ export class HUD3D extends Phaser.Scene {
             mobileLandscape ? 8 : this.cameras.main.height - 52
           )
           .setText(
-            scene.player.currentEquipped.quantity >= 1 ? 
-            scene.player.currentEquipped.quantity.toString() : '0'
+            this._scene.player.currentEquipped.quantity >= 1 ? 
+            this._scene.player.currentEquipped.quantity.toString() : '0'
           )
-          .setColor(scene.player.currentEquipped.quantity >= 1 ? "#ffffff" : "#ff0000")
-          .setStroke(scene.player.currentEquipped.quantity >= 1 ? '#000000' : '#ffffff', 3);
+          .setColor(this._scene.player.currentEquipped.quantity >= 1 ? "#ffffff" : "#ff0000")
+          .setStroke(this._scene.player.currentEquipped.quantity >= 1 ? '#000000' : '#ffffff', 3);
 
 
           //---------- update textA
 
 
-            if (this.textA && scene.timeLeft)
+            if (this.textA && this._scene.timeLeft)
             {
 
               //timed game
@@ -144,11 +146,11 @@ export class HUD3D extends Phaser.Scene {
                 if (this.textAValue)
                   this.textAValue.setText('0');
 
-                scene.gameOver();
+                  this._scene.gameOver();
 
               }
 
-              if (scene.timeLeft === '0:00')
+              if (this._scene.timeLeft === '0:00')
                 exit();
 
               if (SkeetShoot.getGameState())
@@ -156,12 +158,12 @@ export class HUD3D extends Phaser.Scene {
 
                 //set red tint to time format if below 10 seconds
 
-                this.textAValue.setText(scene.timeLeft);
+                this.textAValue.setText(this._scene.timeLeft);
 
                 if (
-                  Number(scene.timeLeft.substr(0, 1)) === 0 && 
-                  Number(scene.timeLeft.substr(2, 1)) === 0 &&
-                  Number(scene.timeLeft.substr(3, 1)) <= 9
+                  Number(this._scene.timeLeft.substr(0, 1)) === 0 && 
+                  Number(this._scene.timeLeft.substr(2, 1)) === 0 &&
+                  Number(this._scene.timeLeft.substr(3, 1)) <= 9
                 )
                   this.textAValue.setTint(0xff0000);  
               }

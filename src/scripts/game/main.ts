@@ -12,9 +12,17 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
   public rounds: number = 1
   public timeLeft: string
 
-  private __scene: Phaser.Scene 
+  private _scene: Phaser.Scene 
   private swankyVelvet: ENABLE3D.ExtendedObject3D
   private enemies: Meatball[] = []
+
+  private assetCache: string[] = [ 
+    'range', 
+    'carrot', 
+    'broccoli', 
+    'sv',
+    'meatball_3d'
+  ]
 
   public static gameState: boolean = false
   private static score: number = 0
@@ -25,10 +33,10 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
     super({ key: 'SkeetShoot' });
   }
 
-  private init([__scene, rounds]): void
+  private init([_scene, rounds]): void
   {
 
-   this.__scene = __scene;
+   this._scene = _scene;
    this.rounds = rounds;
    this.data['currentStage'] = 'SkeetShoot';
    this.enemies = [];
@@ -44,8 +52,8 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
     System.Process.app.game.init(this);
 
-    await System.Process.app.ThirdDimension.init(this, 10, 10, -10);  
-    await System.Process.app.ThirdDimension.create(this, 'room', [0, 0, 0, true, { currentEquipped: 'automac1000' }]);  //apply defaults
+    await System.Process.app.ThirdDimension.init(this, new ENABLE3D.THREE.Vector3(10, 10, -10), this.assetCache);  
+    await System.Process.app.ThirdDimension.create(this, 'range', [0, 0, 0, true, { currentEquipped: 'automac1000' }]);  //apply defaults
 
     System.Process.app.ThirdDimension.Inventory3D.ammo.automac1000 = Infinity;
 
@@ -173,7 +181,7 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
         this.sound.stopAll(); 
         this.sound.removeAll();
 
-        this.scene.restart([this.__scene, SkeetShoot.level]);
+        this.scene.restart([this._scene, SkeetShoot.level]);
       }); 
     });
 

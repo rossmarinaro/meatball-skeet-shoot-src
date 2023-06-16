@@ -1,7 +1,6 @@
 const path = require('path')
-const merge = require('webpack-merge')
+const {merge} = require('webpack-merge')
 const common = require('./webpack.common')
-const JavaScriptObfuscator = require('webpack-obfuscator')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 const prod = {
@@ -19,25 +18,7 @@ const prod = {
       }
     }
   },
-  plugins: [
-    new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns: [path.resolve(__dirname, '../dist/*.js')] }),
-    new JavaScriptObfuscator(
-      {
-        rotateStringArray: true,
-        stringArray: true,
-        // stringArrayEncoding: 'base64', // disabled by default
-        stringArrayThreshold: 0.75,
-        compact: true, 
-        controlFlowFlattening: true, 
-        controlFlowFlatteningThershold: 1, 
-        numbersToExpressions: true, 
-        simplify: true, 
-        stringArrayShuffle: true,
-        splitStrings: true, 
-      },
-      ['vendors.*.js']
-    )
-  ]
+  plugins: [new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns: [path.resolve(__dirname, '../dist/*.js')] })]
 }
 
 module.exports = merge(common, prod)

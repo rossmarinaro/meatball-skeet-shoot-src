@@ -111,7 +111,7 @@ export class Text {
         if (overlap !== null)
         {
             overlap.active = false;
-            System.Process.app.physics.collisions.blockCollideCallback(overlap);
+           // System.Process.app.physics.collisions.blockCollideCallback(overlap);
         }
 
     //is this text related to selections?
@@ -124,7 +124,7 @@ export class Text {
         if (optionsArr === null)
             optionsArr = [];
 
-        System.Process.app.text.exec(scene, 'dialog', null, options, optionsArr, message, stage, bool);
+      //  System.Process.app.text.exec(scene, 'dialog', null, options, optionsArr, message, stage, bool);
 
         scene.time.delayedCall(3000, ()=> {
 
@@ -197,14 +197,14 @@ export class TextUI extends Phaser.Scene {
     
         switch(textType)
         {
-            case 'intro' : this.textOutput = this.add.text((5 / 100) * this.cameras.main.width, 0, "", { font: `${System.Process.app.text.fontSystem.intro} Bangers`, wordWrap: { width: this.scale.width - (10 / 100) * this.scale.width, useAdvancedWrap: true}, align: 'left'}).setColor('#ffff00').setStroke('#ff0000', 4).setShadow(4, 4, '#000000', 1, false).setDepth(2); break;
-            case 'dialog' : case 'select' : this.textOutput = this.add.text((5 / 100) * this.cameras.main.width, 0, "", { font: `${System.Process.app.text.fontSystem.game} Bangers`, wordWrap: { width: this.scale.width - (10 / 100) * this.scale.width, useAdvancedWrap: true}, align: 'left'}).setColor('#ffffff').setStroke('#000000', 5).setDepth(2); break;
-            case 'multiplayer' : 
-                    this.textOutput = this.add.text(this.avatar.x + 50, this.avatar.y, "", { fontSize: `${System.Process.app.text.fontSystem.game}`, wordWrap: { width: this.scale.width - (10 / 100) * this.scale.width, useAdvancedWrap: true}, align: 'left'}).setColor(textColor).setStroke('#000000', 5).setDepth(2); 
-                //show avatar of other players
-                    if (textColor !== null && !textColor.startsWith('#'))
-                        this.avatar.setVisible(true);
-            break;
+         //   case 'intro' : this.textOutput = this.add.text((5 / 100) * this.cameras.main.width, 0, "", { font: `${System.Process.app.text.fontSystem.intro} Bangers`, wordWrap: { width: this.scale.width - (10 / 100) * this.scale.width, useAdvancedWrap: true}, align: 'left'}).setColor('#ffff00').setStroke('#ff0000', 4).setShadow(4, 4, '#000000', 1, false).setDepth(2); break;
+           // case 'dialog' : case 'select' : this.textOutput = this.add.text((5 / 100) * this.cameras.main.width, 0, "", { font: `${System.Process.app.text.fontSystem.game} Bangers`, wordWrap: { width: this.scale.width - (10 / 100) * this.scale.width, useAdvancedWrap: true}, align: 'left'}).setColor('#ffffff').setStroke('#000000', 5).setDepth(2); break;
+            // case 'multiplayer' : 
+            //         this.textOutput = this.add.text(this.avatar.x + 50, this.avatar.y, "", { fontSize: `${System.Process.app.text.fontSystem.game}`, wordWrap: { width: this.scale.width - (10 / 100) * this.scale.width, useAdvancedWrap: true}, align: 'left'}).setColor(textColor).setStroke('#000000', 5).setDepth(2); 
+            //     //show avatar of other players
+            //         if (textColor !== null && !textColor.startsWith('#'))
+            //             this.avatar.setVisible(true);
+            // break;
         }
 
         this.txtGraphics = this.add.graphics();
@@ -252,7 +252,7 @@ export class TextUI extends Phaser.Scene {
             
             this.textYes = this.add.text((35 / 100) * this.scale.width, this.scale.height / 2, "Yes", { font: '50px Bangers', wordWrap: { width: this.scale.width - (10 / 100) * this.scale.width, useAdvancedWrap: true}, align: 'left'}).setColor('#ffff00').setStroke('#ff0000', 4).setShadow(4, 4, '#000000', 1, false).setDepth(2).setInteractive()
             .on('pointerdown', () =>{
-                System.Process.app.events.ee.emit('game', System.Process.app.text.acceptString);  
+               // System.Process.app.events.ee.emit('game', System.Process.app.text.acceptString);  
                 this.time.delayedCall(800, ()=> this.scene.stop('TextUI'));
             });
             this.textNo = this.add.text((65 / 100) * this.scale.width, this.scale.height / 2, "No", { font: '50px Bangers', wordWrap: { width: this.scale.width - (10 / 100) * this.scale.width, useAdvancedWrap: true}, align: 'left'}).setColor('#ffff00').setStroke('#ff0000', 4).setShadow(4, 4, '#000000', 1, false).setDepth(2).setInteractive()
@@ -261,7 +261,7 @@ export class TextUI extends Phaser.Scene {
                 this.options = false;
                 this.time.delayedCall(800, ()=> this.scene.stop('TextUI'));
             });
-            System.Process.app.text.textContext = scene;
+           // System.Process.app.text.textContext = scene;
             System.Process.app.text.acceptString = text;
         }
 
@@ -272,7 +272,7 @@ export class TextUI extends Phaser.Scene {
             .on('pointerdown', () =>{
                 System.Process.app.game.cutScene = false;
                 this.options = false;
-                System.Process.app.events.ee.emit('dialog', true);
+                //System.Process.app.events.ee.emit('dialog', true);
                 this.time.delayedCall(800, ()=> this.scene.stop('TextUI'));
             });
 
@@ -280,7 +280,7 @@ export class TextUI extends Phaser.Scene {
             .on('pointerdown', () =>{
                 System.Process.app.game.cutScene = false;
                 this.options = false;
-                System.Process.app.events.ee.emit('dialog', false);
+                //System.Process.app.events.ee.emit('dialog', false);
                 this.time.delayedCall(800, ()=> this.scene.stop('TextUI'));
             });
 
@@ -292,7 +292,7 @@ export class TextUI extends Phaser.Scene {
                 .on('pointerdown', () =>{
                     System.Process.app.game.cutScene = false;
                     this.options = false;
-                    System.Process.app.events.ee.emit('dialog', null);
+                   // System.Process.app.events.ee.emit('dialog', null);
                     this.time.delayedCall(800, ()=> this.scene.stop('TextUI'));
                 });
             }
@@ -300,17 +300,17 @@ export class TextUI extends Phaser.Scene {
 
         //menu inputs
 							
-            System.Process.app.inputs.implementMenuSelections(
-            this, 
-            [             
-                this.textYes,
-                this.textNo,
-                this.textOpA,
-                this.textOpB,
-                this.textOpC
-            ], 
-            scene.scene.get('Modal')
-        );
+        //     System.Process.app.inputs.implementMenuSelections(
+        //     this, 
+        //     [             
+        //         this.textYes,
+        //         this.textNo,
+        //         this.textOpA,
+        //         this.textOpB,
+        //         this.textOpC
+        //     ], 
+        //     scene.scene.get('Modal')
+        // );
     
     }
 

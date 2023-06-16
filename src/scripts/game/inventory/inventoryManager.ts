@@ -2,19 +2,20 @@ import * as types from '../../../../typings/types';
 import * as ENABLE3D from '@enable3d/phaser-extension';
 
 import { System } from '../../internals/Config';
-
+import { Pickup3D } from '../pickup';
 import { PlayerItem } from './playerItem';
+import { Actor } from '../Actor';
 
 
 export class Inventory3D {
 
-    private static weapons: string[] = ['rolling_pin1', 'penne_pistol', 'automac1000']
+    private static weapons: string[] = ['rolling_pin1', 'penne_pistol', 'automac1000', 'rigatoni_rocket_launcher']
     private static powerups: string[] = ['ikura_maki_tile']
     private static selections: string[] = [...Inventory3D.weapons, ...Inventory3D.powerups]
-    private static currentInventory: string[] = []
 
+    public static currentInventory: string[] = []
     public static currentSelection: string = ''
-
+    public static pickup: typeof Pickup3D = Pickup3D
     public static ammo: types.ammo = {
         automac1000: 0,
         penne_pistol: 0,
@@ -27,7 +28,7 @@ export class Inventory3D {
 
     public static reset(base: number): void
     {
-
+    
         Inventory3D.currentSelection = '';
         Inventory3D.currentInventory = [];
         
@@ -41,7 +42,7 @@ export class Inventory3D {
     }
 
 
-    //------------------------------------------------ ammo
+//------------------------------------------------ ammo
 
 
     public static makeUnlimitedAmmo (): void
@@ -55,14 +56,11 @@ export class Inventory3D {
         }
     }
 
+
 //------------------------------------------------ get item / pickup
 
-    public static async aquirePickup (
 
-        scene: ENABLE3D.Scene3D, 
-        obj: ENABLE3D.ExtendedObject3D
-
-    ): Promise<void>
+    public static async aquirePickup (scene: ENABLE3D.Scene3D, obj: ENABLE3D.ExtendedObject3D): Promise<void>
     {
         
         if (obj.hasBody && Inventory3D.selections.includes(obj['key']))
@@ -70,8 +68,8 @@ export class Inventory3D {
 
             System.Process.app.audio.play('macaroni_ring', 1, false, scene, 0);
 
-            const str = await System.Process.utils.strings.removeJunk(obj['key']),
-                  article = await System.Process.utils.strings.checkVowel(str),
+            const str = await System.Config.utils.strings.removeJunk(obj['key']),
+                  article = await System.Config.utils.strings.checkVowel(str),
                   player = scene['player'];
 
             scene.scene.get('Alerts')['alert']('small', `You picked up ${article} ${str}`);
@@ -92,7 +90,8 @@ export class Inventory3D {
                 
                     scene.data['weapons'].push(obj['key']);
     
-                    player.currentEquipped.obj.remove(player.currentEquipped.obj.children[0]);
+                    if (player.currentEquipped.obj)
+                        player.currentEquipped.obj.remove(player.currentEquipped.obj.children[0]);
 
                     Inventory3D.increment(scene, obj);
                     Inventory3D.setItem(scene, obj['key']);
@@ -108,7 +107,9 @@ export class Inventory3D {
         }
     }
 
+
 //------------------------------ set item
+
 
     public static async setItem(scene: ENABLE3D.Scene3D, item: string): Promise<void>
     {
@@ -127,9 +128,9 @@ export class Inventory3D {
                 case 'rolling_pin1' : 
                     return [0, false];
                 case 'penne_pistol' :
-                    return [Inventory3D.ammo.penne_pistol, true];
                 case 'automac1000' : 
-                    return [Inventory3D.ammo.automac1000, true]; 
+                case 'rigatoni_rocket_launcher' : 
+                    return [Inventory3D.ammo[item], true]; 
                 default: return null;
             }
         },
@@ -155,14 +156,42 @@ export class Inventory3D {
 
 
 
+//-------------------------------- check next best item
+
+
+    public static checkNextBestItem(scene: ENABLE3D.Scene3D): void
+    {
+
+        Inventory3D.currentInventory.forEach(async () => {
+
+            for (let entry of Object.entries(Inventory3D.ammo))
+
+                if (Inventory3D.currentInventory.includes(entry[0]) && entry[1] > 0)
+                {
+                    await Inventory3D.setItem(scene, entry[0]);
+                    return;
+                }
+                
+                else
+                {
+                    if (Inventory3D.currentInventory.includes('rolling_pin3'))
+                        await Inventory3D.setItem(scene, 'rolling_pin3');
+
+                    else if (Inventory3D.currentInventory.includes('rolling_pin2'))
+                        await Inventory3D.setItem(scene, 'rolling_pin2');
+
+                    else 
+                        await Inventory3D.setItem(scene, 'rolling_pin1'); 
+                }
+                
+        });
+    }
+
+
 //------------------------------- remove player's first person accessory
 
-    public static setAsStandAloneItem (
 
-        target: ENABLE3D.ExtendedObject3D, 
-        child: ENABLE3D.ExtendedObject3D
-
-    ): void
+    public static setAsStandAloneItem ( target: ENABLE3D.ExtendedObject3D, child: ENABLE3D.ExtendedObject3D): void
     {
     
         switch(target['key'])
@@ -181,20 +210,21 @@ export class Inventory3D {
                 target.scale.set(5, 5, 5);
                 target['capacity'] = 30;
             break;
+            case 'rigatoni_rocket_launcher': 
+                target.scale.set(7, 7, 7);
+                target['capacity'] = 10;
+            break;
             case 'ikura_maki_tile':
                 target.scale.set(2, 2, 2);
             break;
         }
     }
 
+
     //--------------------------------- set third person weapon
 
-    public static setItemForThirdPerson (
 
-        target: ENABLE3D.ExtendedObject3D, 
-        child: ENABLE3D.ExtendedObject3D
-
-    ): void
+    public static setItemForThirdPerson ( target: Actor, child: ENABLE3D.ExtendedObject3D): void
     {
     
         switch(target['key'])
@@ -208,8 +238,12 @@ export class Inventory3D {
                 target.scale.set(5, 5, 5);
                 Inventory3D.checkObjNames(child, 'arm', 'glove', 'muzzle'); 
             break;
+            case 'rigatoni_rocket_launcher':
+                target.scale.set(6.1, 6.1, 6.1);
+            break;
         }
     }
+
 
 //------------------------------- decrement
 
@@ -223,15 +257,11 @@ export class Inventory3D {
         scene['player'].currentEquipped.quantity = Inventory3D.ammo[subject];
     }
 
+
 //---------------------------------- increment
 
 
-    private static async increment(
-        
-        scene: ENABLE3D.Scene3D, 
-        obj: ENABLE3D.ExtendedObject3D
-        
-    ): Promise<void>
+    private static async increment( scene: ENABLE3D.Scene3D, obj: ENABLE3D.ExtendedObject3D ): Promise<void>
     {
         const key = obj['key'], 
         
@@ -241,10 +271,11 @@ export class Inventory3D {
 
                 switch (key)
                 {
-                    case 'automac1000': 
-                        return Inventory3D.ammo.automac1000 += obj['capacity']; 
                     case 'penne_pistol': 
-                        return Inventory3D.ammo.penne_pistol += obj['capacity']; 
+                    case 'automac1000': 
+                    case 'rigatoni_rocket_launcher': 
+                        return Inventory3D.ammo[key] += obj['capacity']; 
+            
                     default: return;
                 }
             },
@@ -264,21 +295,25 @@ export class Inventory3D {
     {
 
         if (argA && child.name.includes(argA) || 
-        (argB && child.name.includes(argB)) || 
-        (argC && child.name.includes(argC)))
+           (argB && child.name.includes(argB)) || 
+           (argC && child.name.includes(argC)))
 
         child.visible = false;
     }
-        
+
+    
 //------------------------------------------------ check if item exists
+
 
 
     private static async checkDoesExist (obj: ENABLE3D.ExtendedObject3D): Promise<boolean>
     {
+
         if (Inventory3D.currentInventory.includes(obj['key']))
             return true;
         
         Inventory3D.currentInventory.push(obj['key']);
+        
         return false;
     }
 

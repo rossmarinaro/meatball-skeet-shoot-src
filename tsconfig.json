@@ -1,32 +1,14 @@
 {
-    "compilerOptions": {
-      "target": "ES2015",
-      "module": "ES2015",
-
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true,
-  
-      "allowJs": true,
-      "allowUnreachableCode": false,
-      "noImplicitAny": false,
-      "sourceMap": true,
-      "strictPropertyInitialization": false,
-  
-      "moduleResolution": "node",
-      "lib": ["dom", "esnext"]
-    },
-    "include": ["src/scripts/game/*", "src/scripts/internals/*"],
-    "exclude": [
-      "node_modules", 
-      "**/*.spec.ts", 
-      "dist/*", 
-      "src/assets/*",
-      "src/scripts/ajax.js",
-      "src/scripts/plugins/*",
-      "src/scripts/preload/*",
-      "./typings/**/*"
-    ]
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "allowUnreachableCode": false,
+    "sourceMap": true,
+    "strictPropertyInitialization": false,
+    "lib": ["dom", "es6", "esnext"]
   }
-  
+}

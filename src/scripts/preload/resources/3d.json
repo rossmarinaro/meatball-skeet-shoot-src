@@ -4,11 +4,10 @@
 
         { "meatball_3d": "assets/meshes/meatball.glb" },
         { "automac1000": "assets/meshes/automac1000.glb" },
-        { "room": "assets/meshes/room.glb" },
+        { "range": "assets/meshes/room.glb" },
         { "carrot": "assets/meshes/carrot.glb" },
         { "broccoli": "assets/meshes/broccoli.glb" },
         { "bullet_3d": "assets/meshes/macaroni.glb" },
-        { "penne_3d": "assets/meshes/penne_3d.glb" },
         { "sv": "assets/meshes/sv.fbx" },
         { "glove_yellow": "assets/textures/glove_yellow.png" },
         { "bh_model": "assets/meshes/bh_model.fbx" },

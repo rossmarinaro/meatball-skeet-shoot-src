@@ -1,14 +1,16 @@
 
 //-------------------------------------------------    CONTROLLER
 
+
 import * as ENABLE3D from '@enable3d/phaser-extension';
 import { System } from '../internals/Config'; 
+import { Player3D } from './player';
 
 
 export class Controller3D {
 
   private scene: ENABLE3D.Scene3D
-  private player: typeof System.Process.app.ThirdDimension.Player3D
+  private player: Player3D
   private gamePadStatus: number
   private pointerMoveX: number
   private pointerMoveY: number
@@ -44,7 +46,9 @@ export class Controller3D {
     setCameraOffset: Function
   } 
 
+
   //---------------------------------------- constructor
+
 
     constructor(scene: ENABLE3D.Scene3D)
     {
@@ -61,35 +65,47 @@ export class Controller3D {
 
     }
 
-    //------------------------------- initialize controls
 
-    public init(player: typeof System.Process.app.ThirdDimension.Player3D): void
+  //------------------------------- initialize controls
+
+
+    public init(player: Player3D): void
     {
 
       this.player = player;
 
-    //---------- first / third person perspective controls object 
+    // first / third person perspective controls object 
   
       this.perspectiveControls = {
 
-        type: 'first',
+        type: 'third',
         camera: {
           first: new ENABLE3D.FirstPersonControls(this.scene.third.camera, this.player, {targetRadius: 0}),
           third: new ENABLE3D.ThirdPersonControls(this.scene.third.camera, this.player, {targetRadius: 30})
         },
-        setCameraOffset: (camera: ENABLE3D.FirstPersonControls | ENABLE3D.ThirdPersonControls): void => {
+
+        setCameraOffset: (camera: ENABLE3D.FirstPersonControls | ENABLE3D.ThirdPersonControls): void => { 
 
           if (!this.player.raycaster)
             return;
-
-          const direction = this.scene.third.camera.getWorldDirection(this.player.raycaster.ray.direction);
             
+          const direction = this.scene.third.camera.getWorldDirection(this.player.raycaster.ray.direction),
+            
+                bounds = System.Process.app.ThirdDimension.LevelManager3D.bounds,
+            
+                zoomFactor = !bounds ? 50 : 
+                       (this.player.position.x >= bounds.left || this.player.position.x <= bounds.right) ||
+                       (this.player.position.z >= bounds.top || this.player.position.z <= bounds.bottom) ? 
+                        5 : 50;
+
             camera.offset = new ENABLE3D.THREE.Vector3 (
-              this.perspectiveControls.type === 'third' ? -direction.normalize().x * 50 : 0, 
-              15, 
-              this.perspectiveControls.type === 'third' ? -direction.normalize().z * 50 : 0
-            );
+
+              this.perspectiveControls.type === 'third' ? -direction.normalize().x * zoomFactor : 0, 
+              15,
+              this.perspectiveControls.type === 'third' ? -direction.normalize().z * zoomFactor : 0
+            );  
         },
+
         update: (x: number, y: number): void => {
 
         //set respective offsets
@@ -97,125 +113,136 @@ export class Controller3D {
           this.perspectiveControls.setCameraOffset(this.perspectiveControls.camera.first);
           this.perspectiveControls.setCameraOffset(this.perspectiveControls.camera.third);
 
-          //update perspective cameras
-
+        //update perspective cameras
+ 
           this.perspectiveControls.camera.third.update(x, y);
           this.perspectiveControls.camera.first.update(x, y);
+
         }
       }
 
 
       if (System.Config.mobileAndTabletCheck()) //virtual controls
       {
-            const joystickPlugin = this.scene.plugins.get('rexvirtualjoystickplugin');
-            
-            this.scene.input.addPointer(1);
 
-            this.joystickBase1 = this.scene.add.circle(100, 450, 50, 0x000000).setAlpha(0.5);
-            this.joystickThumb1 = this.scene.add.circle(100, 450, 30, 0xcccccc).setAlpha(0.5);
-            this.joystick1 = joystickPlugin['add'](this.scene, {
-                forceX: 0,
-                forceY: 0,
-                x: 100,
-                y: 450,
-                radius: 60,
-                base: this.joystickBase1,
-                thumb: this.joystickThumb1
-            });
-            this.joystickBase2 = this.scene.add.circle(this.scene.scale.width - 50, 450, 50, 0x000000).setAlpha(0.5);
-            this.joystickThumb2 = this.scene.add.circle(this.scene.scale.width - 100, 450, 30, 0xcccccc).setAlpha(0.5);
-            this.joystick2 = joystickPlugin['add'](this.scene, {
-                forceX: 0,
-                forceY: 0,
-                x: this.scene.scale.width - 100,
-                y: 450,
-                radius: 60,
-                base: this.joystickBase2,
-                thumb: this.joystickThumb2
-            });
-            this.buttonA = this.scene.add.circle(40, 500, 20, 0x000000).setAlpha(0.5)
-                .setInteractive()
-                .on('pointerdown', this.openMenu);
-            this.buttonB = this.scene.add.circle(100, 550, 20, 0x000000).setAlpha(0.5)
-                .setInteractive()
-                .on('pointerdown', ()=> this.shoot = true)
-                .on('pointerup', ()=> this.shoot = false)
-                .on('pointerout', ()=> this.shoot = false);
-            this.buttonC = this.scene.add.circle(this.scene.scale.width - 100, 550, 20, 0x000000).setAlpha(0.5)
-                .setInteractive()
-                .on('pointerdown', ()=> this.zoom = true)
-                .on('pointerup', ()=> this.zoom = false)
-                .on('pointerout', ()=> this.zoom = false);
-            this.buttonD = this.scene.add.circle(this.scene.scale.width - 50, 510, 20, 0x000000).setAlpha(0.5)
-                .setInteractive()
-                .on('pointerdown', ()=> this.crouching = true)
-                .on('pointerup', ()=> this.crouching = false)
-                .on('pointerout', ()=> this.crouching = false);
-            this.buttonE = this.scene.add.circle(this.scene.scale.width - 50, 590, 20, 0x000000).setAlpha(0.5)
-                .setInteractive()
-                .on('pointerdown', ()=> this.jump = true)
-                .on('pointerup', ()=> this.jump = false)
-                .on('pointerout', ()=> this.jump = false);
-            this.buttonF = this.scene.add.circle(this.scene.scale.width - 150, 590, 20, 0x000000).setAlpha(0.5)
-                .setInteractive()
-                .on('pointerdown', this.openChatWindow); 
-            this.buttonG = this.scene.add.circle(40, 590, 20, 0x000000).setAlpha(0.5)
-                .setInteractive()
-                .on('pointerdown', ()=> this.togglePerspectiveCamera()); 
+        const joystickPlugin = this.scene.plugins.get('rexvirtualjoystickplugin');
+        
+        this.scene.input.addPointer(1);
 
-          //listen for resize
+        this.joystickBase1 = this.scene.add.circle(100, 450, 50, 0x000000).setAlpha(0.5);
+        this.joystickThumb1 = this.scene.add.circle(100, 450, 30, 0xcccccc).setAlpha(0.5);
+        this.joystick1 = joystickPlugin['add'](this.scene, {
+            forceX: 0,
+            forceY: 0,
+            x: 100,
+            y: 450,
+            radius: 60,
+            base: this.joystickBase1,
+            thumb: this.joystickThumb1
+        });
+        this.joystickBase2 = this.scene.add.circle(this.scene.scale.width - 50, 450, 50, 0x000000).setAlpha(0.5);
+        this.joystickThumb2 = this.scene.add.circle(this.scene.scale.width - 100, 450, 30, 0xcccccc).setAlpha(0.5);
+        this.joystick2 = joystickPlugin['add'](this.scene, {
+            forceX: 0,
+            forceY: 0,
+            x: this.scene.scale.width - 100,
+            y: 450,
+            radius: 60,
+            base: this.joystickBase2,
+            thumb: this.joystickThumb2
+        });
+        this.buttonA = this.scene.add.circle(40, 500, 20, 0x000000).setAlpha(0.5)
+            .setInteractive()
+            .on('pointerdown', this.openMenu);
+        this.buttonB = this.scene.add.circle(100, 550, 20, 0x000000).setAlpha(0.5)
+            .setInteractive()
+            .on('pointerdown', ()=> this.shoot = true)
+            .on('pointerup', ()=> this.shoot = false)
+            .on('pointerout', ()=> this.shoot = false);
+        this.buttonC = this.scene.add.circle(this.scene.scale.width - 100, 550, 20, 0x000000).setAlpha(0.5)
+            .setInteractive()
+            .on('pointerdown', ()=> this.zoom = true)
+            .on('pointerup', ()=> this.zoom = false)
+            .on('pointerout', ()=> this.zoom = false);
+        this.buttonD = this.scene.add.circle(this.scene.scale.width - 50, 510, 20, 0x000000).setAlpha(0.5)
+            .setInteractive()
+            .on('pointerdown', ()=> this.crouching = true)
+            .on('pointerup', ()=> this.crouching = false)
+            .on('pointerout', ()=> this.crouching = false);
+        this.buttonE = this.scene.add.circle(this.scene.scale.width - 50, 590, 20, 0x000000).setAlpha(0.5)
+            .setInteractive()
+            .on('pointerdown', ()=> this.jump = true)
+            .on('pointerup', ()=> this.jump = false)
+            .on('pointerout', ()=> this.jump = false);
+        this.buttonF = this.scene.add.circle(this.scene.scale.width - 150, 590, 20, 0x000000).setAlpha(0.5)
+            .setInteractive()
+            .on('pointerdown', this.openChatWindow); 
+        this.buttonG = this.scene.add.circle(40, 590, 20, 0x000000).setAlpha(0.5)
+            .setInteractive()
+            .on('pointerdown', ()=> this.togglePerspectiveCamera()); 
 
-            this.scene.scale.on('resize', ()=> this.resizeWindow(this.scene), false);
-            screen.orientation?.addEventListener('change', ()=> this.resizeWindow(this.scene), false);
-            screen.orientation?.addEventListener('webkitfullscreenchange', ()=> this.resizeWindow(this.scene), false);
         }
-        else ////keyboard
+
+        //keyboard
+
+        else 
         {
-            this.keys = {
-              w: this.scene.input.keyboard.addKey('w'),
-              a: this.scene.input.keyboard.addKey('a'),
-              s: this.scene.input.keyboard.addKey('s'),
-              d: this.scene.input.keyboard.addKey('d'),
-              q: this.scene.input.keyboard.addKey('q'),
-              e: this.scene.input.keyboard.addKey('e'),
-              shift: this.scene.input.keyboard.addKey('shift'),
-              space: this.scene.input.keyboard.addKey('space'),
-              tab: this.scene.input.keyboard.addKey('tab'),
-              ctrl: this.scene.input.keyboard.addKey('ctrl')
-            }
+          
+          this.keys = {
+            w: this.scene.input.keyboard.addKey('w'),
+            a: this.scene.input.keyboard.addKey('a'),
+            s: this.scene.input.keyboard.addKey('s'),
+            d: this.scene.input.keyboard.addKey('d'),
+            q: this.scene.input.keyboard.addKey('q'),
+            e: this.scene.input.keyboard.addKey('e'),
+            shift: this.scene.input.keyboard.addKey('shift'),
+            space: this.scene.input.keyboard.addKey('space'),
+            tab: this.scene.input.keyboard.addKey('tab'),
+            ctrl: this.scene.input.keyboard.addKey('ctrl')
+          }
 
         //trigger inventory menu
             
-          this.scene.input.keyboard.on('keydown-TAB', ()=> this.openChatWindow());
+          this.scene.input.keyboard.on('keydown-TAB', ()=> this.openChatWindow())
 
         //open chat window
 
-          this.scene.input.keyboard.on('keydown-CTRL', ()=> this.openMenu());
+            .on('keydown-CTRL', ()=> this.openMenu())
 
         //toggle camera first / third person perspective
 
-          this.scene.input.keyboard.on('keydown-SHIFT', ()=> this.togglePerspectiveCamera());
+            .on('keydown-SHIFT', ()=> this.togglePerspectiveCamera());
 
         // lock the pointer and update the first person control
   
-            this.scene.input
+          this.scene.input
+        
+            .on('pointerdown', () => {
 
-            .on('pointerdown', () => /* !this.scene.scene.get('Menu3D').scene.settings.active && */ this.scene.input.mouse.requestPointerLock())
+              // if (
+              //   !this.scene.scene.get('Menu3D').scene.settings.active && 
+              //   !this.scene.scene.get('Modal').scene.settings.active
+              // )
+                this.scene.input.mouse.requestPointerLock();
+            })
 
-            .on('pointermove', (pointer: Phaser.Input.Pointer) => {
+            .on('pointermove', (pointer: Phaser.Input.Pointer): void => {
 
-                if (this.scene.input.mouse.locked)
-                {
-                  this.pointerMoveX = pointer.prevPosition.x !== this.scene.input.activePointer.movementX ? this.scene.input.activePointer.movementX : 0;   
-                  this.pointerMoveY = pointer.prevPosition.y !== this.scene.input.activePointer.movementY ? this.scene.input.activePointer.movementY : 0;
-                  this.perspectiveControls.update(this.pointerMoveX, this.pointerMoveY);
-                }
+              if (this.scene.input.mouse.locked && pointer)
+              {
+                
+                this.pointerMoveX = this.scene.input.activePointer.movementX;   
+                this.pointerMoveY = this.scene.input.activePointer.movementY;
+                
+                this.perspectiveControls.update(this.pointerMoveX, this.pointerMoveY);
+                
+              }
             });
         }
 
       //-------------------------gamepad
 
-        this.scene.input.gamepad.on('down', (pad: any, button: any, status: number) => { 
+        this.scene.input.gamepad.on('down', (pad: any, button: any, status: number): void => { 
 
           this.gamePadStatus = status;
 
@@ -255,7 +282,12 @@ export class Controller3D {
           if (this.player !== null && this.player.initialized)
           {
 
+            this.resizeWindow(this.scene);
+
             this.perspectiveControls.update(0, 0);
+
+            // if (this.perspectiveControls.type === 'third')
+            //   this.perspectiveControls.camera.first.update(this.perspectiveControls.camera.third.);
 
             System.Process.app.input.type === 'touch' === true ? 
               this.dumpVirtualJoyStickState() : this.dumpKeyState();
@@ -277,14 +309,16 @@ export class Controller3D {
             if (this.shoot)
               this.attack(time);
   
-            if (this.shoot === false)
+            if (!this.shoot)
               System.Process.app.audio.stop('automac1000_shot', this.scene);
               
           }
         });
     }
   
+
   //---------------------------- inventory menu
+
 
     private openMenu (): void 
     {
@@ -292,54 +326,73 @@ export class Controller3D {
       // this.scene.scene.run('Menu3D', this.scene);
     }
 
+
   //------------------------------ chat
+
 
     private openChatWindow (): void
     {
-      // this.scene.input.mouse.releasePointerLock();
+      this.scene.input.mouse.releasePointerLock();
       // this.scene.scene.get('Chat')['sendMessage']();
       // this.scene.scene.get('Chat')['toggleChatWindow']();
     }
 
+
   //-------------------------------- toggle perspective
+
 
     private togglePerspectiveCamera(): void
     {
 
-        const camera = this.perspectiveControls.type === 'third' ? 
-          this.perspectiveControls.camera.first : this.perspectiveControls.camera.third;
+      const camera = this.perspectiveControls.type === 'third' ? 
+          this.perspectiveControls.camera.first : 
+          this.perspectiveControls.camera.third;
     
       //set current camera (first, third)
 
-       this.perspectiveControls.type = camera === this.perspectiveControls.camera.first ?
-          'first' : 'third';
+      this.perspectiveControls.type = camera === this.perspectiveControls.camera.first ?
+        'first' : 'third';
     
-
     }
 
 
-  
+
   //---------------------------------------- zoom
+
 
     private zoomWeapon(): void
     {
-      //this.crossHairs.alpha = 0
-      this.player.movement.x = ENABLE3D.THREE.MathUtils.lerp(this.player.movement.x, this.player.currentEquipped.obj.zoomY, 0.2); 
+
+      const currentEquipped = this.player['currentEquipped'].obj;
+      
+      if (!currentEquipped)
+        return;
+
+      this.player.movement.x = ENABLE3D.THREE.MathUtils.lerp(this.player.movement.x - currentEquipped.zoom.x, currentEquipped.zoom.y, 0.2);
       this.player.movement.y = ENABLE3D.THREE.MathUtils.lerp(this.player.movement.y, 1, 0.2);
       this.player.movement.z = ENABLE3D.THREE.MathUtils.lerp(this.player.movement.z, -0.45, 0.2);
     }
   
+
   //------------------------------------------- attack
+
   
     private attack(time: number): void
     {
 
       const playerWeapon = this.player['currentEquipped']; 
 
-      if (playerWeapon.quantity >= 1)
-        playerWeapon.obj.recoil(time);
+      if (!playerWeapon.obj)
+        return;
 
-      if (/* this.scene.scene.get('Menu3D').scene.settings.active || */ this.isFiring === true)
+      if (
+          playerWeapon.quantity >= 1 &&
+          (System.Config.isDesktop(this.scene) && this.scene.input.mouse.locked) ||
+          System.Config.mobileAndTabletCheck()
+      )
+        playerWeapon.obj.recoil(time); 
+
+      if (/* this.scene.scene.get('Menu3D').scene.settings.active || */ this.isFiring)
         return;
 
       this.isFiring = true;
@@ -354,15 +407,15 @@ export class Controller3D {
   
     private dumpKeyState(): void
     {
-      if (this.gamePadStatus === 1)
+
+      if (this.gamePadStatus === 1 /* || System.Process.app.game.multiplayer.chat */)
         return;
 
       this.zoom = this.scene.input.mousePointer.rightButtonDown();
       this.shoot = this.scene.input.mousePointer.leftButtonDown();
 
 
-
-    //------------- crouch
+    //crouch
 
         if (this.keys.q.isDown)
         {
@@ -394,6 +447,7 @@ export class Controller3D {
 
           if (this.keys.w.isDown)
             this.player.move(0, -41);
+
           else if (this.keys.s.isDown)
             this.player.move(0, 41);  
 
@@ -401,6 +455,7 @@ export class Controller3D {
 
           else if (this.keys.a.isDown)
             this.player.move(-41, 0);
+            
           else if (this.keys.d.isDown)
             this.player.move(41, 0);
         }
@@ -453,7 +508,7 @@ export class Controller3D {
           return;
 
       if (System.Process.app.input.type === 'touch')
-      {
+      
         setTimeout(()=> {
           
           if (System.Config.isPortrait(scene)) 
@@ -489,7 +544,7 @@ export class Controller3D {
             this.buttonG?.setPosition(70, this.joystick1.y + 140);
           }
         }, 1000);
-      }
+      
     }
   }
   

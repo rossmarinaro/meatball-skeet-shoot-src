@@ -1,28 +1,27 @@
-const port = process.env.PORT || 9000,
+const 
+webpack = require('webpack'),
+path = require('path');
 
-  webpack = require('webpack'),
-  path = require('path'),
-  CopyWebpackPlugin = require('copy-webpack-plugin'),
-  HtmlWebpackPlugin = require('html-webpack-plugin'),
-  { InjectManifest } = require('workbox-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  entry: ['./src/index.js', './webpack/credits.js'],
+  entry: ['./src/scripts/internals/Application.ts'],
   output: {
     path: path.resolve(__dirname, '../dist'),
     filename: '[name].bundle.js',
     chunkFilename: '[name].chunk.js'
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js'],
-    alias: {
-      'System' : path.resolve(__dirname, '../src/scripts/internals/Config')
-    }
+    extensions: ['.ts', '.tsx', '.js']
+  },
+  module: {
+    rules: [{ test: /\.tsx?$/, include: path.join(__dirname, '../src'), loader: 'ts-loader' }]
   },
   optimization: {
     splitChunks: {
       cacheGroups: {
-        commons: {
+        defaultVendors: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
           chunks: 'all',
@@ -31,65 +30,16 @@ module.exports = {
       }
     }
   },
-  module: {
-
-    // noParse: ["ws"],
-     rules: [
-      // {
-      //   test: /\.(gltf)$/,
-      //   loader: '@vxna/gltf-loader',
-      //   options: {inline: true}
-      // },
-       {
-         test: [/\.vert$/, /\.frag$/],
-         use: 'raw-loader'
-       },
-       {
-         test: /\.(gif|png|ogg|jpe?g|svg|xml|mp3|woff|mtl|obj|glb|gltf|bin)$/i, 
-         loader: 'file-loader',
-         options: {esModule: false},
-         exclude: [
-           path.resolve(__dirname, '../src/assets/', '../src/') 
-         ]
-       },
-       {
-         test: /\.css$/i, 
-         use: 
-            ['style-loader', 'css-loader']
-       },
-       {
-        test: /\.ts$/i, 
-        use: 
-           ['ts-loader'],
-        exclude: '/node/modules'
-      }
- 
-     ]
-   },
-  devServer: {
-    port: port,
-    proxy: { 
-      '../socket.io.min.js': { 
-        target: port, 
-        ws: true 
-      } 
-    },
-  },
   plugins: [
     new webpack.ProvidePlugin({
       System: ['System', 'System']
     }),
-    new webpack.DefinePlugin({
-      CANVAS_RENDERER: JSON.stringify(true),
-      WEBGL_RENDERER: JSON.stringify(true)
-    }),
-    new HtmlWebpackPlugin({ gameName: 'Pastaboss: Meatball Skeetshoot', template: 'src/index.html', inject: 'body' }),
-    new CopyWebpackPlugin([
+    new HtmlWebpackPlugin({ gameName: 'My Phaser Game', template: 'src/index.html' }),
+    new CopyWebpackPlugin({
+      patterns: [
       { from: 'src/assets', to: 'assets' },
-      { from: 'pwa', to: '' }
-    ]),
-    new InjectManifest({
-      swSrc: path.resolve(__dirname, '../pwa/sw.js')
-    })
+      { from: 'src/favicon.ico', to: '' }
+
+    ]})
   ]
 }

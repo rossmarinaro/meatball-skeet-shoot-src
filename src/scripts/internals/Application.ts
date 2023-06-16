@@ -7,9 +7,11 @@ import { Game } from '../game/game';
 import { AudioManager } from './Audio';
 import { AjaxManager } from './Ajax';
 import { ShaderManager } from '../shaders/main';
-import { Boot } from '../preload/Boot.js';
-import { Preload } from '../preload/Preload.js';
-import { Background } from '../preload/Background.js';
+import { ResourceManager } from './Resource'
+
+import { Boot } from '../preload/Boot';
+import { Preload } from '../preload/Preload';
+import { Background } from '../preload/Background';
 import { Text, TextUI } from './Text';
 import { ThirdDimension } from './ThirdDimension';
 import { EventManager } from './Events';
@@ -20,6 +22,7 @@ import { Alerts } from './alerts'
 
 export default class Application {
 
+    public resource: typeof ResourceManager = ResourceManager 
     public game: typeof Game = Game
     public ajax: typeof AjaxManager = AjaxManager
     public audio: typeof AudioManager = AudioManager
@@ -29,6 +32,7 @@ export default class Application {
     public ThirdDimension: typeof ThirdDimension = ThirdDimension
 
     public ui: typeof UI = UI
+    public gfx: Phaser.GameObjects.Graphics
 
     public scale: any
     public pipeline: any[]
@@ -38,14 +42,14 @@ export default class Application {
     public account: types.account
     public timeOfDay: Readonly<number>   
     
-    private type: number
-    private physics: any
-    private transparent: boolean
-    private parent: string
-    private backgroundColor: string
-    private dom: { createContainer: boolean }
-    private scene: Phaser.Scene[]
-    private input: types.input
+    public type: number
+    public physics: any
+    public transparent: boolean
+    public parent: string
+    public backgroundColor: string
+    public dom: { createContainer: boolean }
+    public scene: Phaser.Scene[]
+    public input: types.input
 
 
 
@@ -102,6 +106,20 @@ export default class Application {
     }
 
 }
+
+
+//------------ APPLICATION ENTRY POINT ---------------------//
+
+
+window.onload = async () => System.Process.app = new Application(System.Process); 
+
+
+
+//window.onerror = function(err, url, line){
+//alert(`${err}, \n ${url}, \n ${line}`);
+    //window.location.reload();
+//     return true;
+// } 
 
         
 
