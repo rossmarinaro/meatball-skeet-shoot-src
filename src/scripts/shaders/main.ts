@@ -181,7 +181,7 @@ export class ShaderManager {
     private static update3DRenderPipeline(scene: Scene3D): void
     {
 
-        if (!System.Process.app.game.gameState || !scene.third)
+        if (!scene.third)
             return;
 
         requestAnimationFrame(()=> {

@@ -16,7 +16,10 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js']
   },
   module: {
-    rules: [{ test: /\.tsx?$/, include: path.join(__dirname, '../src'), loader: 'ts-loader' }]
+    rules: [
+      { test: /\.tsx?$/, include: path.join(__dirname, '../src'), loader: 'ts-loader' },
+      { test: /\.css$/i, use: ["style-loader", "css-loader" ] },
+    ]
   },
   optimization: {
     splitChunks: {
@@ -34,9 +37,10 @@ module.exports = {
     new webpack.ProvidePlugin({
       System: ['System', 'System']
     }),
-    new HtmlWebpackPlugin({ gameName: 'My Phaser Game', template: 'src/index.html' }),
+    new HtmlWebpackPlugin({ gameName: 'Pastaboss: Meatball Skeetshoot', template: 'src/index.html' }),
     new CopyWebpackPlugin({
       patterns: [
+      { from: 'src/index.css', to: 'index.css' },
       { from: 'src/assets', to: 'assets' },
       { from: 'src/favicon.ico', to: '' }
 

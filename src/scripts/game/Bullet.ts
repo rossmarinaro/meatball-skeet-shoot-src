@@ -16,13 +16,13 @@ export class Bullet extends Actor {
 
   public static async checkAttackSource (player: any, object: ENABLE3D.ExtendedObject3D): Promise<Readonly<boolean>> 
   { 
-    
+     
     return object['objType'] === 'player' && 
            object['playerID'] !== player.playerID ? 
             true : false; 
   }
 
-  //---------------------------
+  //--------------------------- 
 
   constructor (
   

@@ -38,7 +38,7 @@
     <meta name="color-scheme" content="light dark">
 
     <link rel="stylesheet" type="text/css" href="./index.css" />
-    <link rel="icon" type="image/png" sizes="192x192" href="./icons/logo.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./assets/logo.png" />
 
 
     <title>Pastaboss: Meatball Skeetshoot &#127837; &#128076; </title>
@@ -56,20 +56,8 @@
   </head>
   <body>
 
-<!--  init wasm:: to use: (<any>window.wasmLoad(argA, argB))  -->
 
-     <script type="module">
-        import init, { add } from '../assets/wasm/pkg/hello_wasm.js';
-        await init();
-        window.wasmLoad = async function(a, b) {
-            return add(a, b);
-        }
+    <div id="game"></div>    
 
-      </script>
-
-      
-    <div id="game"></div>
-
-    </body>
 
 </html>

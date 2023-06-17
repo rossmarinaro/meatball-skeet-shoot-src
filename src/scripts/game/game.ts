@@ -12,7 +12,7 @@ export class Game {
 
     public static groups?: any
     public static groundArray: any[]
-    public static gameState: boolean = false
+    public static gameState: boolean = false 
     public static gameSaved: boolean = false
 
     public static cutScene: boolean = false

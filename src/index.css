@@ -28,7 +28,7 @@
 		box-sizing: border-box; 
 	}
 	body{
-		/* background-color: #000000; */background-image: url("assets/static/spaghetti.svg");
+		 background-color: #000000; 
 	}
 
 }

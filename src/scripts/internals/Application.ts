@@ -1,22 +1,25 @@
 ///**** APPLICATION LEVEL CONFIG ***////  
 
+
+import '../../style.css'
+
 import * as types from '../../../typings/types'
 
-import { System } from './Config';
-import { Game } from '../game/game';
-import { AudioManager } from './Audio';
-import { AjaxManager } from './Ajax';
-import { ShaderManager } from '../shaders/main';
+import { System } from './Config'
+import { Game } from '../game/game'
+import { AudioManager } from './Audio'
+import { AjaxManager } from './Ajax'
+import { ShaderManager } from '../shaders/main'
 import { ResourceManager } from './Resource'
 
-import { Boot } from '../preload/Boot';
-import { Preload } from '../preload/Preload';
-import { Background } from '../preload/Background';
-import { Text, TextUI } from './Text';
-import { ThirdDimension } from './ThirdDimension';
-import { EventManager } from './Events';
-import { HUD3D } from '../game/hud';
-import { UI } from './UI';
+import { Boot } from '../preload/Boot'
+import { Preload } from '../preload/Preload'
+import { Background } from '../preload/Background'
+import { Text, TextUI } from './Text'
+import { ThirdDimension } from './ThirdDimension'
+import { EventManager } from './Events'
+import { HUD3D } from '../game/hud'
+import { UI } from './UI' 
 import { Alerts } from './alerts'
 
 
