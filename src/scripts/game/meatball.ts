@@ -14,13 +14,17 @@ export class Meatball extends Actor {
   constructor(scene: ENABLE3D.Scene3D, x: number, y: number, z: number)
   {
 
-    super(scene, 'meatball_3d', x, y, z, true, true, ()=> {
-      this.scene.third.physics.add.existing(this, { 
-        shape: 'sphere', 
-        mass: 0.5, 
-        collisionFlags: 6, 
-        radius: 7
-      });
+    super(scene, 'meatball_3d', x, y, z, true, true, () => {
+
+        this.position.x = x;
+        this.position.z = z;
+
+        this.scene.third.physics.add.existing(this, { 
+            shape: 'sphere', 
+            mass: 0.5, 
+            collisionFlags: 6, 
+            radius: 7
+        });
     });
 
     //tween
@@ -37,7 +41,7 @@ export class Meatball extends Actor {
       y: tmp.y + Math.random() * 100, 
       repeat: -1, 
       yoyo: true,
-    onUpdate: ()=> {
+    onUpdate: () => {
       this.position.setY(tmp.y);
       if (this.body !== null && this.body !== undefined)
         this.body.needUpdate = true; 

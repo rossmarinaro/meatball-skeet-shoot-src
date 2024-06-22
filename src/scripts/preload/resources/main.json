@@ -1,7 +1,9 @@
 
 
 {  
-    
+    "image": [
+        { "automac1000": "assets/textures/automac1000.png" }
+    ],
     "audio": [
         { "huh": "assets/audio/sounds/huh.ogg" },
         { "pistol_shot": "assets/audio/sounds/pistol_shot.ogg" },

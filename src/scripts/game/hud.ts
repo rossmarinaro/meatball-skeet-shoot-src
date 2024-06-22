@@ -15,6 +15,11 @@ export class HUD3D extends Phaser.Scene {
       _2: Phaser.GameObjects.Rectangle
     }
 
+    private equippedWeapon: {
+        icon: Phaser.GameObjects.Image | null,
+        key: string
+    }
+
     private ammo: {
       text: Phaser.GameObjects.Text | null
       quantity: Phaser.GameObjects.Text | null
@@ -44,6 +49,12 @@ export class HUD3D extends Phaser.Scene {
           _2: this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 2, 50, 0x000000)
       }
 
+      this.equippedWeapon = {
+
+        icon: null,
+        key: ''
+      }
+
       this.ammo = {
         text: null,
         quantity: null
@@ -61,6 +72,8 @@ export class HUD3D extends Phaser.Scene {
 
     private async createUI (size: number, textA?: string, textB?: string, textC?: string): Promise<void>
     {
+
+      this.equippedWeapon.icon = this.add.image(80, this.cameras.main.height - 100, this.equippedWeapon.key).setScale(0.7).setVisible(false);
 
       this.ammo.text = this.add.text(20, this.cameras.main.height - 50, 'AMMO: ', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ff0000").setStroke('#ffff00', 2).setShadow(2, 2, '#000000', 1, false);
       this.ammo.quantity = this.add.text(110, this.cameras.main.height - 52, '', {fontSize: size + "px", fontFamily: "Digitizer"}).setColor("#ff0000").setStroke('#ffffff', 3);
@@ -126,6 +139,18 @@ export class HUD3D extends Phaser.Scene {
           )
           .setColor(this._scene.player.currentEquipped.quantity >= 1 ? "#ffffff" : "#ff0000")
           .setStroke(this._scene.player.currentEquipped.quantity >= 1 ? '#000000' : '#ffffff', 3);
+
+        //equipped weapon icon
+  
+        this.equippedWeapon.key = this._scene.player.currentEquipped.key;
+
+        this.equippedWeapon.icon?.setPosition(
+            mobileLandscape ? innerWidth / 2 + 40 : 50, 
+            mobileLandscape ? 20 : 
+            System.Config.isLandscape(this._scene) ? this.cameras.main.height - 50 : innerHeight - 50
+        )
+        .setTexture(this.equippedWeapon.key)
+        .setVisible(true);
 
 
           //---------- update textA

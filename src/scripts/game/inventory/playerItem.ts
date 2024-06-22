@@ -33,6 +33,26 @@ export class PlayerItem extends Actor {
       const item = await this.getItemZoomParams();
   
       this.zoom = { x: item[0], y: item[1] };
+
+      const 
+      
+      fireTexture = new ENABLE3D.THREE.TextureLoader().load('assets/textures/fire.png'),
+
+      fireShaderMaterial = System.Process.app.shaders.createShaderMaterial(
+        'pnoise_Vert', 
+        'muzzleFlash_Frag', 
+        {
+          blending: 'AdditiveBlending',
+          depthTest: true, 
+          transparent: true,
+          uniforms: {
+            alpha: { value: Math.random() * 1 },
+            tExplosion: { type: 't', value: fireTexture },
+            time: { type: 'f', value: 0.0 },
+            resolution: { value: new ENABLE3D.THREE.Vector2(innerWidth, innerHeight)}
+          }
+        }
+      );
       
       //iterate child meshes
       
@@ -51,30 +71,14 @@ export class PlayerItem extends Actor {
       
         if (child.name.includes('muzzle')) 
         {
-      
-          const fireTexture = new ENABLE3D.THREE.TextureLoader().load('assets/textures/fire.png');
-      
-          fireTexture.wrapS = fireTexture.wrapT = ENABLE3D.THREE.RepeatWrapping;
-      
-          child.visible = false; 
-      
-          child.material = System.Process.app.shaders.createShaderMaterial(
-            'pnoise_Vert', 
-            'muzzleFlash_Frag', 
-            {
-              blending: 'AdditiveBlending',
-              depthTest: true, 
-              transparent: true,
-              uniforms: {
-                alpha: { value: Math.random() * 1 },
-                tExplosion: { type: 't', value: fireTexture },
-                time: { type: 'f', value: 0.0 },
-                resolution: { value: new ENABLE3D.THREE.Vector2(innerWidth, innerHeight)}
-              }
-            }
-          );
-      
-        }
+            
+            fireTexture.wrapS = fireTexture.wrapT = ENABLE3D.THREE.RepeatWrapping;
+        
+            child.visible = false; 
+        
+            child.material = fireShaderMaterial;
+        
+        }    
       
         else if (child.isMesh) 
         {

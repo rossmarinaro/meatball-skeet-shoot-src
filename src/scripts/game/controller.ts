@@ -18,6 +18,7 @@ export class Controller3D {
   private shoot: boolean
   private isFiring: boolean
   private crouching: boolean
+  private isIdle: boolean
   private jump: boolean
   private keys: any
   private joystick1: any
@@ -59,6 +60,7 @@ export class Controller3D {
       this.pointerMoveY = 0;
       this.zoom = false;
       this.shoot = false;
+      this.isIdle = true;
       this.isFiring = false
       this.joystick1 = null;
       this.joystick2 = null;
@@ -75,6 +77,25 @@ export class Controller3D {
       this.player = player;
 
     // first / third person perspective controls object 
+
+        let timeToIdle: Phaser.Time.TimerEvent,
+            freeCamdir: boolean = false,
+            isFreeCam: boolean = false;
+
+        const idleCB = (timer: Phaser.Time.TimerEvent): void => {
+
+            if (!this.isIdle) {
+                isFreeCam = false;
+                timer.reset(idleTimerConfig);
+            }
+            else {
+                freeCamdir = Math.floor(Math.random() * 10) + 1 > 5; 
+                isFreeCam = true;
+            } 
+        },
+
+    idleTimerConfig = { startAt: 0, delay: 10000, repeat: -1, callback: () => idleCB(timeToIdle) };
+    timeToIdle = this.scene.time.addEvent(idleTimerConfig);
   
       this.perspectiveControls = {
 
@@ -108,15 +129,20 @@ export class Controller3D {
 
         update: (x: number, y: number): void => {
 
+            if (!this.isIdle) {
+                isFreeCam = false;
+                timeToIdle.reset(idleTimerConfig);
+            }
+
         //set respective offsets
 
-          this.perspectiveControls.setCameraOffset(this.perspectiveControls.camera.first);
-          this.perspectiveControls.setCameraOffset(this.perspectiveControls.camera.third);
+            this.perspectiveControls.setCameraOffset(this.perspectiveControls.camera.first);
+            this.perspectiveControls.setCameraOffset(this.perspectiveControls.camera.third);
 
         //update perspective cameras
- 
-          this.perspectiveControls.camera.third.update(x, y);
-          this.perspectiveControls.camera.first.update(x, y);
+        
+            this.perspectiveControls.camera.third.update(isFreeCam && this.perspectiveControls.type === 'third' ? freeCamdir ? x += 5 : x -= 5 : x, y);
+            this.perspectiveControls.camera.first.update(x, y);
 
         }
       }
@@ -443,6 +469,8 @@ export class Controller3D {
         else 
         {
 
+            this.isIdle = false;
+
         //forward / back
 
           if (this.keys.w.isDown)
@@ -467,10 +495,17 @@ export class Controller3D {
     private dumpVirtualJoyStickState(): void
     {
       
-      if (this.joystick1 !== null)
-        this.joystick1.force !== 0 ?
-          this.player.move(this.joystick1.forceX, this.joystick1.forceY) : 
-          this.player.idle();
+        if (this.joystick1 !== null) 
+        {
+            if (this.joystick1.force !== 0) {
+                this.isIdle = false;
+                this.player.move(this.joystick1.forceX, this.joystick1.forceY)
+            }
+            else {
+                this.isIdle = true;
+                this.player.idle();
+            }
+        }
 
       if (this.joystick2 !== null)
         this.perspectiveControls.update(this.joystick2.forceX / 10, this.joystick2.forceY / 10);
@@ -482,18 +517,23 @@ export class Controller3D {
     private dumpGameControllerState(): void
     {
 
-      let lookSpeed = 5,
-          moveSpeed = 100;
+        let lookSpeed = 5,
+            moveSpeed = 100;
 
-      this.leftStick = this.scene.input.gamepad['_pad1'].leftStick;
-      this.rightStick = this.scene.input.gamepad['_pad1'].rightStick; 
+        this.leftStick = this.scene.input.gamepad['_pad1'].leftStick;
+        this.rightStick = this.scene.input.gamepad['_pad1'].rightStick; 
 
-      this.leftStick.x !== 0 && this.leftStick.y !== 0 ? 
-          this.player.move (
-            this.leftStick.x * moveSpeed, 
-            this.leftStick.y * moveSpeed
-          ) : 
-          this.player.idle();
+        if (this.leftStick.x !== 0 && this.leftStick.y !== 0) {
+            this.isIdle = false;
+            this.player.move (
+                this.leftStick.x * moveSpeed, 
+                this.leftStick.y * moveSpeed
+            );
+        } 
+        else {
+            this.isIdle = true;
+            this.player.idle();
+        }
 
       this.perspectiveControls.update(this.rightStick.x * lookSpeed, this.rightStick.y * lookSpeed);
 
