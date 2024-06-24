@@ -20,6 +20,7 @@ export class Controller3D {
   private crouching: boolean
   private isIdle: boolean
   private jump: boolean
+  private move: boolean
   private keys: any
   private joystick1: any
   private joystick2: any
@@ -60,6 +61,7 @@ export class Controller3D {
       this.pointerMoveY = 0;
       this.zoom = false;
       this.shoot = false;
+      this.move = false;
       this.isIdle = true;
       this.isFiring = false
       this.joystick1 = null;
@@ -141,7 +143,7 @@ export class Controller3D {
 
         //update perspective cameras
         
-            this.perspectiveControls.camera.third.update(isFreeCam && this.perspectiveControls.type === 'third' ? freeCamdir ? x += 5 : x -= 5 : x, y);
+            this.perspectiveControls.camera.third.update(isFreeCam && this.perspectiveControls.type === 'third' ? freeCamdir ? x += 3 : x -= 3 : x, y);
             this.perspectiveControls.camera.first.update(x, y);
 
         }
@@ -254,15 +256,17 @@ export class Controller3D {
 
             .on('pointermove', (pointer: Phaser.Input.Pointer): void => {
 
-              if (this.scene.input.mouse.locked && pointer)
-              {
-                
-                this.pointerMoveX = this.scene.input.activePointer.movementX;   
-                this.pointerMoveY = this.scene.input.activePointer.movementY;
-                
-                this.perspectiveControls.update(this.pointerMoveX, this.pointerMoveY);
-                
-              }
+                if (this.scene.input.mouse?.locked && pointer)
+                { 
+        
+                    if (!this.move) {
+                        this.isIdle = false;
+                        this.scene.time.delayedCall(idleTimerConfig.delay, () => this.isIdle = true);
+                    }
+
+                    this.perspectiveControls.update(pointer.movementX, pointer.movementY);
+                  
+                }
             });
         }
 
@@ -280,10 +284,13 @@ export class Controller3D {
 
           if (pad.A || pad.R1 || pad.R2) 
             this.shoot = true;
+
           if (pad.B) 
             this.jump = true;
+
           if (pad.Y) 
             this.zoom = true;
+
           if (pad.X) 
             this.crouching = true;
         })
@@ -422,6 +429,7 @@ export class Controller3D {
         return;
 
       this.isFiring = true;
+      this.isIdle = false;
       this.scene.time.delayedCall(250, ()=> this.isFiring = false);
 
       this.player.attack();
@@ -463,13 +471,17 @@ export class Controller3D {
 
       //------------set to idle
 
-        if (this.keys.w.isUp && this.keys.a.isUp && this.keys.s.isUp && this.keys.d.isUp)
-          this.player.idle();
+        if (this.keys.w.isUp && this.keys.a.isUp && this.keys.s.isUp && this.keys.d.isUp) {
+            this.isIdle = true;
+            this.move = false;
+            this.player.idle();
+        }
         
         else 
         {
 
             this.isIdle = false;
+            this.move = true;
 
         //forward / back
 
@@ -495,20 +507,30 @@ export class Controller3D {
     private dumpVirtualJoyStickState(): void
     {
       
-        if (this.joystick1 !== null) 
+        if (this.joystick1 !== null)
         {
             if (this.joystick1.force !== 0) {
                 this.isIdle = false;
+                this.move = true;
                 this.player.move(this.joystick1.forceX, this.joystick1.forceY)
             }
             else {
                 this.isIdle = true;
+                this.move = false;
                 this.player.idle();
             }
         }
 
-      if (this.joystick2 !== null)
-        this.perspectiveControls.update(this.joystick2.forceX / 10, this.joystick2.forceY / 10);
+        if (this.joystick2 !== null)
+        {
+            if (this.joystick2.force !== 0) 
+                this.isIdle = false;
+            
+            else 
+                this.isIdle = true;
+            
+            this.perspectiveControls.update(this.joystick2.forceX / 10, this.joystick2.forceY / 10);
+        }
       
     }
 
@@ -520,22 +542,25 @@ export class Controller3D {
         let lookSpeed = 5,
             moveSpeed = 100;
 
-        this.leftStick = this.scene.input.gamepad['_pad1'].leftStick;
-        this.rightStick = this.scene.input.gamepad['_pad1'].rightStick; 
+        this.leftStick = this.scene.input.gamepad && this.scene.input.gamepad['_pad1'].leftStick;
+        this.rightStick = this.scene.input.gamepad && this.scene.input.gamepad['_pad1'].rightStick; 
 
-        if (this.leftStick.x !== 0 && this.leftStick.y !== 0) {
+        if (this.leftStick.x !== 0 && this.leftStick.y !== 0)
+        {
             this.isIdle = false;
-            this.player.move (
-                this.leftStick.x * moveSpeed, 
-                this.leftStick.y * moveSpeed
-            );
+            this.move = true;
+            this.player.move(this.leftStick.x * moveSpeed, this.leftStick.y * moveSpeed);
         } 
         else {
-            this.isIdle = true;
-            this.player.idle();
+          this.isIdle = true;
+          this.move = false;
+          this.player.idle();
         }
 
-      this.perspectiveControls.update(this.rightStick.x * lookSpeed, this.rightStick.y * lookSpeed);
+        if (this.rightStick.x !== 0 && this.rightStick.y !== 0)
+            this.isIdle = false;
+
+        this.perspectiveControls.update(this.rightStick.x * lookSpeed, this.rightStick.y * lookSpeed);
 
     }
 
