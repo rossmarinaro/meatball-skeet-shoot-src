@@ -144,7 +144,7 @@ export class PlayerItem extends Actor {
 
     //prevent action if mouse lock disabled (desktop only)
 
-    if (!this.scene.input.mouse.locked && System.Config.isDesktop(this.scene))
+    if (!this.scene.input.mouse.locked && !System.Config.mobileAndTabletCheck())
       return;
 
     //weapon specific logic

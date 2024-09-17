@@ -159,25 +159,6 @@ export class HUD3D extends Phaser.Scene {
             if (this.textA && this._scene.timeLeft)
             {
 
-              //timed game
-
-              const exit = () => {
-
-                if (gameOver)
-                return;
-            
-                gameOver = true;
-            
-                if (this.textAValue)
-                  this.textAValue.setText('0');
-
-                  this._scene.gameOver();
-
-              }
-
-              if (this._scene.timeLeft === '0:00')
-                exit();
-
               if (SkeetShoot.getGameState())
               {
 
@@ -192,8 +173,7 @@ export class HUD3D extends Phaser.Scene {
                 )
                   this.textAValue.setTint(0xff0000);  
               }
-              else
-                exit();
+             
 
             }
  

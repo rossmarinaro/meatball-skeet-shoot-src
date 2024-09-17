@@ -168,6 +168,7 @@ export class Controller3D {
             base: this.joystickBase1,
             thumb: this.joystickThumb1
         });
+
         this.joystickBase2 = this.scene.add.circle(this.scene.scale.width - 50, 450, 50, 0x000000).setAlpha(0.5);
         this.joystickThumb2 = this.scene.add.circle(this.scene.scale.width - 100, 450, 30, 0xcccccc).setAlpha(0.5);
         this.joystick2 = joystickPlugin['add'](this.scene, {
@@ -179,35 +180,42 @@ export class Controller3D {
             base: this.joystickBase2,
             thumb: this.joystickThumb2
         });
-        this.buttonA = this.scene.add.circle(40, 500, 20, 0x000000).setAlpha(0.5)
-            .setInteractive()
-            .on('pointerdown', this.openMenu);
+
+        //this.buttonA = this.scene.add.circle(40, 500, 20, 0x000000).setAlpha(0.5)
+            //.setInteractive()
+            //.on('pointerdown', this.openMenu);
+
         this.buttonB = this.scene.add.circle(100, 550, 20, 0x000000).setAlpha(0.5)
             .setInteractive()
-            .on('pointerdown', ()=> this.shoot = true)
-            .on('pointerup', ()=> this.shoot = false)
-            .on('pointerout', ()=> this.shoot = false);
+            .on('pointerdown', () => this.shoot = true)
+            .on('pointerup', () => this.shoot = false)
+            .on('pointerout', () => this.shoot = false);
+
         this.buttonC = this.scene.add.circle(this.scene.scale.width - 100, 550, 20, 0x000000).setAlpha(0.5)
             .setInteractive()
-            .on('pointerdown', ()=> this.zoom = true)
-            .on('pointerup', ()=> this.zoom = false)
-            .on('pointerout', ()=> this.zoom = false);
+            .on('pointerdown', () => this.zoom = true)
+            .on('pointerup', () => this.zoom = false)
+            .on('pointerout', () => this.zoom = false);
+
         this.buttonD = this.scene.add.circle(this.scene.scale.width - 50, 510, 20, 0x000000).setAlpha(0.5)
             .setInteractive()
-            .on('pointerdown', ()=> this.crouching = true)
-            .on('pointerup', ()=> this.crouching = false)
-            .on('pointerout', ()=> this.crouching = false);
+            .on('pointerdown', () => this.crouching = true)
+            .on('pointerup', () => this.crouching = false)
+            .on('pointerout', () => this.crouching = false);
+
         this.buttonE = this.scene.add.circle(this.scene.scale.width - 50, 590, 20, 0x000000).setAlpha(0.5)
             .setInteractive()
-            .on('pointerdown', ()=> this.jump = true)
-            .on('pointerup', ()=> this.jump = false)
-            .on('pointerout', ()=> this.jump = false);
-        this.buttonF = this.scene.add.circle(this.scene.scale.width - 150, 590, 20, 0x000000).setAlpha(0.5)
-            .setInteractive()
-            .on('pointerdown', this.openChatWindow); 
+            .on('pointerdown', () => this.jump = true)
+            .on('pointerup', () => this.jump = false)
+            .on('pointerout', () => this.jump = false);
+
+        //this.buttonF = this.scene.add.circle(this.scene.scale.width - 150, 590, 20, 0x000000).setAlpha(0.5)
+            //.setInteractive()
+            //.on('pointerdown', this.openChatWindow); 
+
         this.buttonG = this.scene.add.circle(40, 590, 20, 0x000000).setAlpha(0.5)
             .setInteractive()
-            .on('pointerdown', ()=> this.togglePerspectiveCamera()); 
+            .on('pointerdown', () => this.togglePerspectiveCamera()); 
 
         }
 

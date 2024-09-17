@@ -28,6 +28,12 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
   private static score: number = 0
   private static level: number = 1
   private static spawns: number = 10
+  
+  public setTime(factor: string): void { this.timeLeft = factor; }
+  public static incrementScore(): void { SkeetShoot.score++; } 
+  public static getGameState(): boolean { return SkeetShoot.gameState; } 
+  public static getScore(): string { return SkeetShoot.score.toString(); }
+  public static getLevel(): string { return SkeetShoot.level.toString(); }
 
   constructor() {
     super({ key: 'SkeetShoot' });
@@ -94,47 +100,14 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
   public update (): void
   {
-    if (SkeetShoot.score >= SkeetShoot.spawns || this.timeLeft === '0:00')
-      SkeetShoot.gameState = false; //you win
-  }
+    if (SkeetShoot.score >= SkeetShoot.spawns || this.timeLeft === '0:00') 
+    {
+        this.gameOver();
+        SkeetShoot.gameState = false;  
 
-
-  //----------------------------------
-
-  
-  public setTime(factor: string): void
-  {
-    this.timeLeft = factor;
-  }
-
-  
-  //---------------------------------
-
-  public static incrementScore(): void
-  {
-    SkeetShoot.score++;
-  } 
-
-  //---------------------------------
-
-  
-  public static getGameState(): boolean
-  {
-    return SkeetShoot.gameState;
-  } 
-
-  //----------------------------------
-
-  public static getScore(): string
-  {
-    return SkeetShoot.score.toString();
-  }
-
-  //----------------------------------
-
-  public static getLevel(): string
-  {
-    return SkeetShoot.level.toString();
+        if (this.timeLeft === '0:00')
+            this.timeLeft = '0:00';
+    }
   }
 
 
@@ -163,26 +136,26 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
     this.time.delayedCall(3000, () => {   
 
-      const alert = this.scene.get('Alerts');
+        const alert = this.scene.get('Alerts');
 
-      alert['alert']('large', `YOU ${SkeetShoot.score === SkeetShoot.spawns ? 'WIN' : 'LOSE'}!!!!`);
+        alert['alert']('large', `YOU ${SkeetShoot.score === SkeetShoot.spawns ? 'WIN' : 'LOSE'}!!!!`);
 
-      this.time.delayedCall(4000, () => {
+        this.time.delayedCall(4000, () => {
 
-        //cleanup objects
+            //cleanup objects
 
-        System.Process.app.ThirdDimension.reset(this);
+            System.Process.app.ThirdDimension.reset(this);
 
-        SkeetShoot.score === SkeetShoot.spawns ? 
-          SkeetShoot.level++ : SkeetShoot.level = 1;
+            SkeetShoot.score === SkeetShoot.spawns ? 
+            SkeetShoot.level++ : SkeetShoot.level = 1;
 
-        SkeetShoot.score = 0;
+            SkeetShoot.score = 0;
 
-        this.sound.stopAll(); 
-        this.sound.removeAll();
+            this.sound.stopAll(); 
+            this.sound.removeAll();
 
-        this.scene.restart([this._scene, SkeetShoot.level]);
-      }); 
+            this.scene.restart([this._scene, SkeetShoot.level]);
+        }); 
     });
 
   }
