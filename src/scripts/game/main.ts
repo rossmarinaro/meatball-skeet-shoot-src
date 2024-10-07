@@ -76,7 +76,7 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
     
     //spawn meatball targets
 
-    this.time.delayedCall(700, () => {
+    this.time.delayedCall(1000, () => {
 
       for (let i = 0; i < SkeetShoot.spawns; i++)
         this.enemies[i] = new Meatball(
@@ -88,7 +88,7 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
 
       //format the time and decrement
 
-      Clock.decrementTime(this, SkeetShoot.spawns > 10 ? 30000 * 1.25 : 30000);
+      Clock.decrementTime(this, SkeetShoot.spawns > 10 ? (35000 * (SkeetShoot.level * 0.1 + 1)) : 35000);
 
     });
 

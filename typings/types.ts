@@ -5,7 +5,7 @@
 export type orientation = {
     on: (event: string, callback: any, state: any) => void
     off: (event: string, callback: any, state: any) => void
-    lock: (aspectRatio: OrientationLockType) => void
+    lock: (aspectRatio?: OrientationType) => void
     unlock: () => void
 }
 export type ammo = {

@@ -69,11 +69,13 @@ export namespace System {
                 if (screen.orientation && Config.mobileAndTabletCheck()) 
                     return screen.orientation.removeEventListener(event, callback, state)
             },
-            lock: (aspectRatio: OrientationLockType): any => {
-                if (typeof screen.orientation.lock !== null && 
+            lock: (aspectRatio?: OrientationType): void => {
+                if (
+                    typeof screen.orientation['lock'] === 'function' && 
                     typeof screen.orientation !== void 0 && 
-                    Config.mobileAndTabletCheck()) 
-                    return screen.orientation.lock(aspectRatio);
+                    Config.mobileAndTabletCheck()
+                ) 
+                    screen.orientation['lock'](aspectRatio ? aspectRatio : screen.orientation.type);
             },
             unlock: (): any => {
                 if (typeof screen.orientation.unlock !== null && 

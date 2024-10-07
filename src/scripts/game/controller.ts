@@ -582,7 +582,7 @@ export class Controller3D {
 
       if (System.Process.app.input.type === 'touch')
       
-        setTimeout(()=> {
+        setTimeout(() => {
           
           if (System.Config.isPortrait(scene)) 
           {
@@ -600,6 +600,7 @@ export class Controller3D {
             this.joystickThumb2?.setPosition(this.scene.scale.width - 100, 450);
             this.joystick2?.setPosition(this.scene.scale.width - 100, 450);
           }
+          
           else
           {
             this.joystickBase1?.setPosition(100, innerHeight / 2);

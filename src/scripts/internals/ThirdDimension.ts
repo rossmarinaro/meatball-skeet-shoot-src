@@ -113,60 +113,102 @@ export class ThirdDimension {
     //----------------------------------------------- 3d
 
 
-    private static async loadAssets (scene: Phaser.Scene, scene3d: ENABLE3D.Scene3D): Promise<void> 
+    public static async loadAssets (scene: Phaser.Scene, scene3d: ENABLE3D.Scene3D): Promise<void> 
     {
         
         return new Promise(async res => { 
 
+            System.Process.orientation.lock();  
+
             ENABLE3D.THREE.Cache.enabled = true;
 
-            const alerts = scene.scene.get('Alerts');
+            const alerts: Phaser.Scene = scene.scene.get('Alerts');
 
-        //skip preload if items are cached
+            //skip preload if items are cached
 
-            if (ThirdDimension.cache.current.length > 0) 
-            {
+            if (ThirdDimension.cache.current.length > 0) {
                 res(); 
                 return;
             } 
 
-            System.Process.orientation.lock('portrait-primary');
             alerts['alert']('large', 'Loading assets...', 'please wait');
-     
-            let numAssets = 0;
+        
+            let width = 0, 
+                height = 0,
+                numAssets = 0;
+
+            const base = alerts.add.graphics().fillStyle(0xffff00, 1),
+                  base2 = alerts.add.graphics({ lineStyle: { width: 3, color: 0xff0000 } }),
+            
+            progressBarGraphics = alerts.add.graphics();
 
             const resources = await System.Process.app.resource.parser(scene3d, scene.cache.json.get('resources_3d'));
-        
-            resources['assets'].map((resource: any) => {
 
-                System.Process.app.ThirdDimension.cache.preload.filter(async (preloaded: string) => {
+            //load progress update
+
+            alerts.events.on('update', () => {
+
+                width = alerts['GAME_WIDTH'] / 2, 
+                height = alerts['GAME_HEIGHT'] / 2 + 100;
+                
+                const standardAspect: boolean = !System.Config.mobileAndTabletCheck() && System.Config.isLandscape(alerts);
+
+                let percent = (numAssets / 100) * System.Process.app.ThirdDimension.cache.preload.length, 
+                    xPos: number,
+                    yPos: number,
+                    baseW = standardAspect ? (65 / 100) * width : (85 / 100) * width;
+        
+                base.clear().fillStyle(0xffff00, 1).fillRoundedRect(standardAspect ? (68 / 100) * width : (55 / 100) * width, System.Config.mobileAndTabletCheck() && System.Config.isPortrait(alerts) ? (75 / 100) * height : (85 / 100) * height, baseW, 50, 10);
+        
+                base2.clear().strokeRoundedRect(standardAspect ? (68 / 100) * width : (55 / 100) * width, System.Config.mobileAndTabletCheck() && System.Config.isPortrait(alerts) ? (75 / 100) * height : (85 / 100) * height, standardAspect ? (65 / 100) * width : (85 / 100) * width, 50, 10);
+        
+                if (System.Config.mobileAndTabletCheck()) 
+                    yPos = System.Config.isPortrait(alerts) ? (76.7 / 100) * height : (87.5 / 100) * height;
+        
+                else 
+                    yPos = System.Config.isLandscape(alerts) ? (87 / 100) * height : (87.5 / 100) * height;
+
+                xPos = standardAspect ? ((56 / 100) * width) * percent : ((76 / 100) * width) * percent;
+
+                if (xPos < (baseW - 5))
+                    progressBarGraphics?.clear().fillStyle(0xff0000, 1).fillRoundedRect(standardAspect ? (73 / 100) * width : (60 / 100) * width, yPos, xPos, 30, 2);
+    
+            });
+        
+            resources['assets'].forEach((resource: Object): void => {
+
+                System.Process.app.ThirdDimension.cache.preload.forEach(async (asset: string): Promise<void> => {
 
                     const key = String(Object.keys(resource)[0]),
                           path = String(Object.values(resource)[0]),
-                          filetype = System.Config.utils.strings.getFileType(path);  
+                          filetype = System.Config.utils.strings.getFileType(path);   
 
-                //preload only assets used on this scene
- 
-                    if (preloaded === key)
+                    //preload only assets used on this scene
+                   
+                    if (asset === key) 
                     {
-                        switch (filetype)
-                        { 
-                            case 'glb': await scene3d.third.load.gltf(key).then(data => System.Process.app.ThirdDimension.cache.current.push({ key: key, data })); break;
-                            case 'fbx': await scene3d.third.load.fbx(key).then(data => System.Process.app.ThirdDimension.cache.current.push({ key: key, data })); break;
+   
+                        switch (filetype) { 
+                            case 'glb': await scene3d.third.load.gltf(key).then(data => System.Process.app.ThirdDimension.cache.current.push({ key, data })); break;
+                            case 'fbx': await scene3d.third.load.fbx(key).then(data => System.Process.app.ThirdDimension.cache.current.push({ key, data })); break;
                         }
         
                         numAssets++;
 
-                        if(numAssets >= System.Process.app.ThirdDimension.cache.preload.length)
+                        if (numAssets >= System.Process.app.ThirdDimension.cache.preload.length) 
                         {
-                            System.Process.orientation.unlock();
-                            setTimeout(()=> res(alerts['stopAlerts']()), 1000);
+                            setTimeout(() => res(alerts['stopAlerts']()), 1000);
+
+                            progressBarGraphics?.destroy();
+                            base?.destroy();
+                            base2?.destroy();
+
+                            return;
                         }
-            
                     }
+
                 });
             });
-    
         });
     }
 
