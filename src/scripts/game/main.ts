@@ -1,113 +1,144 @@
-/* SHOOTING RANGE */
+/* SHOOTING RANGE SKEETSHOOT*/
 
-import * as ENABLE3D from '@enable3d/phaser-extension';
-import { System } from '../internals/Config'
-import { Meatball } from './meatball';
-import { Actor } from '../game/Actor';
-import { Clock } from '../internals/Clock';
+import * as ENABLE3D from '@enable3d/phaser-extension'
 
+import { Lighting } from './lighting'
+import { Game } from './game'
+import { AudioManager } from '../internals/Audio'
+import { ThirdDimension } from '../internals/ThirdDimension'
 
 export class SkeetShoot extends ENABLE3D.Scene3D {
 
-  public rounds: number = 1
-  public timeLeft: string
-
-  private _scene: Phaser.Scene 
-  private swankyVelvet: ENABLE3D.ExtendedObject3D
-  private enemies: Meatball[] = []
-
   private assetCache: string[] = [ 
-    'range', 
+    'range',  
+    'meatball_3d',
     'carrot', 
     'broccoli', 
-    'sv',
-    'meatball_3d'
+    'automac1000',
+    'sv' 
   ]
 
-  public static gameState: boolean = false
-  private static score: number = 0
-  private static level: number = 1
-  private static spawns: number = 10
+  private timeLeft: string
+  private score: number = 0 
+  private level: number = 1
+  private spawns: number = 10
+  private _scene: Phaser.Scene 
+  private rounds: number 
+  private swankyVelvet: ENABLE3D.ExtendedObject3D
+  private enemies: ENABLE3D.ExtendedObject3D[] = []
+
+  public gameState: boolean = false
+
+  //---------------------------------- helpers 
+ 
+
+  public incrementScore(factor: number): void {
+    this.score += factor;
+  } 
+
+  public setTime(time: number): void {
+    this.timeLeft = time.toString();
+  }
   
-  public setTime(factor: string): void { this.timeLeft = factor; }
-  public static incrementScore(): void { SkeetShoot.score++; } 
-  public static getGameState(): boolean { return SkeetShoot.gameState; } 
-  public static getScore(): string { return SkeetShoot.score.toString(); }
-  public static getLevel(): string { return SkeetShoot.level.toString(); }
+  public get getGameState(): boolean {
+    return this.gameState;
+  } 
+
+  public get getScore(): string {
+    return this.score.toString();
+  }
+
+  public get getTime(): string {
+    return this.timeLeft;
+  }
+
+  public get getLevel(): string {
+    return this.level.toString();
+  }
 
   constructor() {
     super({ key: 'SkeetShoot' });
-  }
+  }  
 
-  private init([_scene, rounds]): void
+  private async init([_scene, rounds]): Promise<void>
   {
 
-   this._scene = _scene;
-   this.rounds = rounds;
-   this.data['currentStage'] = 'SkeetShoot';
-   this.enemies = [];
+    this._scene = _scene;
+    this.data = _scene.data;
+    this.data['currentStage'] = 'SkeetShoot';
+    this.rounds = rounds ? rounds : 1;
+    this.enemies.length = 0;
+    this.gameState = false;
+    this.timeLeft = '';
 
-   if (SkeetShoot.level > 1)
-    SkeetShoot.spawns += SkeetShoot.spawns / 2;
+    if (this.level > 1) 
+        this.spawns += this.spawns / 2;
 
+    //base weapon is not available in this mini game
+
+    const Inventory3D = (await import ('./inventory/inventoryManager')).Inventory3D; 
+
+    Inventory3D.currentInventory.splice(Inventory3D.currentInventory.indexOf('rolling_pin1', 1));
+
+    //set ammo to unlimited
+
+    Inventory3D.makeUnlimitedAmmo();
 
   }
 
   private async create(): Promise<void>
   {
 
-    System.Process.app.game.init(this);
+    Game.initWorld(this);
 
-    await System.Process.app.ThirdDimension.init(this, new ENABLE3D.THREE.Vector3(10, 10, -10), this.assetCache);  
-    await System.Process.app.ThirdDimension.create(this, 'range', [0, 0, 0, true, { currentEquipped: 'automac1000' }]);  //apply defaults
+    const { ThirdDimension } = await import ('../internals/ThirdDimension');
 
-    System.Process.app.ThirdDimension.Inventory3D.ammo.automac1000 = Infinity;
+    await ThirdDimension.init(this, 3, this.assetCache);  
+    await ThirdDimension.create(this, 'range', [0, -60, 0, true, { currentEquipped: 'automac1000' }]);  //apply defaults
 
     //swanky velvet
 
-    this.swankyVelvet = new Actor(this, 'sv', 70, -18, -60, true, true, ()=> {
-      
+    this.swankyVelvet = new (await import ('./Actor')).Actor(this, 'sv', 70, -18, -60, true, true, () => {
       this.swankyVelvet.anims.play('Idle');
-      this.swankyVelvet.rotation.set(0, -180, 0);
-      this.swankyVelvet.scale.set(0.12, 0.12, 0.12);
-
+      this.swankyVelvet.rotation.set(0, -180, 0); 
+      this.swankyVelvet.scale.set(0.12, 0.12, 0.12); 
     });
 
-    
-    //spawn meatball targets
+    this.time.delayedCall(2000, async () => {
 
-    this.time.delayedCall(1000, () => {
+      //spawn meatball targets
 
-      for (let i = 0; i < SkeetShoot.spawns; i++)
-        this.enemies[i] = new Meatball(
-                              this, 
-                              Phaser.Math.Between(-200, 200), 
-                              Phaser.Math.Between(30, 120), 
-                              Phaser.Math.Between(-300, -500)
-                            );
+        for (let i = 0; i < this.spawns; i++)
+            this.enemies[i] = new (await import ('./meatball')).Meatball(this, Phaser.Math.Between(-200, 200), Phaser.Math.Between(30, 120), Phaser.Math.Between(-300, -500));
 
-      //format the time and decrement
+        //format the time and decrement
 
-      Clock.decrementTime(this, SkeetShoot.spawns > 10 ? (35000 * (SkeetShoot.level * 0.1 + 1)) : 35000);
+        (await import (`../internals/Clock`)).Clock.startTimer(this, this.spawns > 10 ? (45000 * (this.level * 0.1 + 1)) : 45000, 'decrement');
+        this.gameState = true;
 
     });
-
-    SkeetShoot.gameState = true;
   }
+
 
   //----------------------------
 
 
   public update (): void
   {
-    if (SkeetShoot.score >= SkeetShoot.spawns || this.timeLeft === '0:00') 
-    {
-        this.gameOver();
-        SkeetShoot.gameState = false;  
 
-        if (this.timeLeft === '0:00')
+    Game.preUpdate(this);
+
+    //end round
+
+    if (this.score >= this.spawns || this.getTime === '0:00') 
+    {
+        if (this.getTime === '0:00')
             this.timeLeft = '0:00';
+
+        this.gameOver();
+        this.gameState = false;  
     }
+
   }
 
 
@@ -116,51 +147,64 @@ export class SkeetShoot extends ENABLE3D.Scene3D {
   public gameOver(): void
   {
 
-    if (!SkeetShoot.gameState)
+    if (!this.gameState)
       return;
 
-    SkeetShoot.gameState = false;
+    Game.gameState = false;
+    this.rounds--;
 
     this.swankyVelvet.anims.play('Laugh');
-    this.time.addEvent(
-      {
-        delay: 3000, callback: ()=> this.swankyVelvet.anims.play(this.swankyVelvet.anims.current === 'Laugh' ? 
-        'Jump' : 'Laugh'), 
+
+    this.time.addEvent({
+        delay: 3000, callback: () => this.swankyVelvet.anims.play(this.swankyVelvet.anims.current === 'Laugh' ? 'Jump' : 'Laugh'), 
         callbackScope: this, 
         repeat: -1
       }
     );
 
-    System.Process.app.audio.play('airhorn', 1, false, this, 0);
-    System.Process.app.ThirdDimension.Lighting.setCreepyLighting(this);
+    AudioManager.play('airhorn', 1, false, this, 0);
 
-    this.time.delayedCall(3000, () => {   
+    Lighting.setCreepyLighting(this, -10);
 
-        const alert = this.scene.get('Alerts');
+    if (this.score === this.spawns) 
+    {
+        if (this.scene.manager.getScene('Alerts')) 
+            this.scene.get('Alerts')['alert']('large', 'YOU WIN!!!!', '$50 dough!');  
+    }
 
-        alert['alert']('large', `YOU ${SkeetShoot.score === SkeetShoot.spawns ? 'WIN' : 'LOSE'}!!!!`);
+    else
+        this.time.delayedCall(2000, () => {   
+    
+            if (this.scene.manager.getScene('Alerts')) 
+                this.scene.get('Alerts')['alert']('large', 'YOU LOSE!!!!');
 
-        this.time.delayedCall(4000, () => {
+            this.time.delayedCall(4000, async () => {
 
-            //cleanup objects
+                //cleanup objects
 
-            System.Process.app.ThirdDimension.reset(this);
+                await ThirdDimension.reset(this);
 
-            SkeetShoot.score === SkeetShoot.spawns ? 
-            SkeetShoot.level++ : SkeetShoot.level = 1;
+                this.score === this.spawns ? 
+                this.level++ : this.level = 1;
 
-            SkeetShoot.score = 0;
+                this.score = 0;
 
-            this.sound.stopAll(); 
-            this.sound.removeAll();
+                this.sound.stopAll(); 
+                this.sound.removeAll();
 
-            this.scene.restart([this._scene, SkeetShoot.level]);
-        }); 
-    });
+                this.scene.restart([this._scene, this.level]);
+            });  
+
+            this.level = 1;
+            this.spawns = 10;
+            this.score = 0;
+
+        });
 
   }
 
 }
+
 
 
 

@@ -1,5 +1,6 @@
 
 import { System } from '../internals/Config';
+import { parseResources } from '../internals/parser';
 
 
 export class Preload extends Phaser.Scene {
@@ -51,9 +52,8 @@ export class Preload extends Phaser.Scene {
 
     private async parse(scene: Phaser.Scene): Promise<void>
     {
-
-        await System.Process.app.resource.parser(scene, scene.cache.json.get('resources_main')); 
-        await System.Process.app.resource.parser(scene, scene.cache.json.get('resources_3d'));
+        await parseResources(scene, scene.cache.json.get('resources_main')); 
+        await parseResources(scene, scene.cache.json.get('resources_3d'));
     }
 
 

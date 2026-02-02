@@ -7,32 +7,17 @@ import * as types from '../../../typings/types'
 
 import { System } from './Config'
 import { Game } from '../game/game'
-import { AudioManager } from './Audio'
-import { AjaxManager } from './Ajax'
-import { ShaderManager } from '../shaders/main'
-import { ResourceManager } from './Resource'
 
 import { Boot } from '../preload/Boot'
 import { Preload } from '../preload/Preload'
 import { Background } from '../preload/Background'
-import { Text, TextUI } from './Text'
-import { ThirdDimension } from './ThirdDimension'
-import { EventManager } from './Events'
+import { TextUI } from './Text'
 import { HUD3D } from '../game/hud'
 import { UI } from './UI' 
 import { Alerts } from './alerts'
 
 
 export default class Application {
-
-    public resource: typeof ResourceManager = ResourceManager 
-    public game: typeof Game = Game
-    public ajax: typeof AjaxManager = AjaxManager
-    public audio: typeof AudioManager = AudioManager
-    public events: typeof EventManager = EventManager
-    public shaders: typeof ShaderManager = ShaderManager
-    public text: typeof Text = Text
-    public ThirdDimension: typeof ThirdDimension = ThirdDimension
 
     public ui: typeof UI = UI
     public gfx: Phaser.GameObjects.Graphics
@@ -100,7 +85,7 @@ export default class Application {
         this.scene = [ 
             new Boot,
             new Preload, 
-            new Background,
+            //new Background,
             ...Game.scene,
             new HUD3D, 
             new TextUI,

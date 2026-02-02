@@ -1,8 +1,11 @@
 
-
 export class Clock {
 
-    private static formatTimeByMilliseconds (milliseconds: number): string
+    private static event: Phaser.Time.TimerEvent
+
+    //----------------------------------
+
+    public static formatTimeByMilliseconds (milliseconds: number): string
     {
 
         const minutes = Number(Math.floor(((milliseconds / 1000) / 60) % 60).toFixed(0)),
@@ -11,15 +14,32 @@ export class Clock {
         return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
       
     }
+
+    //----------------------------------
     
-    public static decrementTime(scene: any, timeLimit: number): void
+    public static startTimer(scene: any, timeLimit: number, type: string): void
     {
+
+        if (typeof scene.setTime !== 'function')
+            return;
+         
+        scene.setTime(this.formatTimeByMilliseconds(timeLimit));
         
-        scene.timeLeft = Clock.formatTimeByMilliseconds(timeLimit);
-        
-        scene.time.addEvent({delay: 1000, callback: () => {
-            timeLimit -= 1000;
-            scene.timeLeft = Clock.formatTimeByMilliseconds(timeLimit);
+        this.event = scene.time.addEvent({delay: 1000, callback: () => {
+            type === 'increment' ? timeLimit += 1000 : timeLimit -= 1000;
+            scene.setTime(this.formatTimeByMilliseconds(timeLimit));
         }, repeat: -1});
+    }
+
+
+    //----------------------------------
+
+    public static stopTimer(): void
+    {
+        if (this.event) {
+            this.event.paused = true;
+            this.event.remove();
+            this.event.destroy();
+        }
     }
 }

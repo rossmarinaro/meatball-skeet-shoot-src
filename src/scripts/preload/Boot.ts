@@ -4,6 +4,7 @@ import { System } from '../internals/Config';
 import resources_main from './resources/main.json';
 import resources_3d from './resources/3d.json';
 import JoyStick from '../plugins/joystick.js';
+import { EventManager } from '../internals/Events';
 
 
 export class Boot extends Phaser.Scene { 
@@ -19,7 +20,7 @@ export class Boot extends Phaser.Scene {
     private async init(): Promise<void> 
     {
 
-        System.Process.app.events.init(this);
+        EventManager.init(this);
         
         
     //game scale 

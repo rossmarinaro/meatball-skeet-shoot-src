@@ -29,7 +29,7 @@ export class UI {
                     callback(scene);
             },
             _resizeCheck = (scene: Phaser.Scene, key: string) => {
-                if (scene.scene.settings.active) 
+                if (scene.scene.settings.active)  
                     _resize(scene, key);
             };
 

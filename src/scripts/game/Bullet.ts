@@ -3,6 +3,7 @@ import * as ENABLE3D from '@enable3d/phaser-extension';
 import { System } from '../internals/Config';
 import { PlayerItem } from './inventory/playerItem';
 import { Actor } from './Actor';
+import { Inventory3D } from './inventory/inventoryManager';
 
 
 export class Bullet extends Actor { 
@@ -78,7 +79,7 @@ export class Bullet extends Actor {
         }
   
         if (!this.hasBody)
-  
+        //@ts-ignore
           this.src.scene.third.physics.add.existing(this, {
             shape: 'sphere', 
             radius: 1, 
@@ -95,12 +96,12 @@ export class Bullet extends Actor {
         this.body.setCcdSweptSphereRadius(0.2);
   
       //destroy on contact or after delay
-  
+       //@ts-ignore
         this.src.scene.time.delayedCall(1500, () => this.src.scene.third.physics.destroy(this));
 
         this.body.on.collision(async () => {
   
-          if (this.hasBody)
+          if (this.hasBody)//@ts-ignore
               this.scene.third.destroy(this);
         });
   
@@ -119,7 +120,7 @@ export class Bullet extends Actor {
   
     //decrement ammo
 
-      System.Process.app.ThirdDimension.Inventory3D.decrement(this.src.scene, this.src.name);
+    Inventory3D.decrement(this.src.scene, this.src.name);
   
     //raycast intersection with target
     
@@ -146,20 +147,22 @@ export class Bullet extends Actor {
   
               target.traverse(child => {
                 
-                if (child.isMesh && child.material['emissive'])
+                if (child.isMesh)
                 {
-  
-                  child.material['emissive'].r = 255;
-                  child.material['emissive'].g = 255;
-                  child.material['emissive'].b = 255;
-  
-                  this.src.scene.time.delayedCall(100, () => {
-  
-                    child.material['emissive'].r = 0;
-                    child.material['emissive'].g = 0;
-                    child.material['emissive'].b = 0;
+                    const mesh = child as unknown as ENABLE3D.THREE.Mesh;
                     
-                  });
+                    if (mesh.material['emissive']) 
+                    {
+                        mesh.material['emissive'].r = 255;
+                        mesh.material['emissive'].g = 255;
+                        mesh.material['emissive'].b = 255;
+
+                        this.scene.time.delayedCall(100, () => {
+                            mesh.material['emissive'].r = 0;
+                            mesh.material['emissive'].g = 0;
+                            mesh.material['emissive'].b = 0;
+                        });
+                    }
                 }
   
               });

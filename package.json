@@ -36,12 +36,12 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@enable3d/phaser-extension": "~0.25.3",
+    "@enable3d/phaser-extension": "^0.26.1",
     "chroma-js": "^2.4.2",
     "matter-js": "^0.19.0",
-    "phaser": "~3.55.2",
     "poly-decomp": "^0.3.0",
-    "three": "~0.144.0"
+    "three": "^0.171.0",
+    "phaser": "~3.80.1"
   },
   "devDependencies": {
     "@types/chroma-js": "^2.4.0",

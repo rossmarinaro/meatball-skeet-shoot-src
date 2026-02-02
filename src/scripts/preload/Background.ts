@@ -1,4 +1,4 @@
-import { System } from '../internals/Config';
+import { ShaderManager } from '../shaders/main';
 
 export class Background extends Phaser.Scene {
 
@@ -23,7 +23,7 @@ export class Background extends Phaser.Scene {
 
                 {
 
-                    this.shader = System.Process.app.shaders.base.fire; 
+                    this.shader = ShaderManager.base.fire; 
 
                     const background = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'fire_pixel')//,
                           //shader = this.add.shader(this.shader, this.cameras.main.width / 2, this.cameras.main.height / 2, this.cameras.main.width, this.cameras.main.height);

@@ -12,7 +12,10 @@
         { "glove_yellow": "assets/textures/glove_yellow.png" },
         { "bh_model": "assets/meshes/bh_model.fbx" },
         { "bh_uv_red": "assets/textures/bh_uv_red.png" },
-        { "island-heightmap": "assets/heightmaps/island.png" },
-        { "nori": "assets/textures/nori.jpg" }
+        { "island-heightmap": "assets/maps/island.png" },
+        { "lightmap": "assets/maps/lightmap.png" },
+        { "lightmap2": "assets/maps/lightmap2.jpg" },
+        { "nori": "assets/textures/nori.jpg" },
+        { "fire-texture-3d": "assets/textures/fire.png" }
     ]
 }
