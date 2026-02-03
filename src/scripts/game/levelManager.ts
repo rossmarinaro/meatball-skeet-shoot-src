@@ -8,6 +8,7 @@ export class LevelManager3D {
   public static currentLevel: string = ''
   public static level: Actor
   public static bounds: { left: number, right: number, top: number, bottom: number } | null 
+  public static lightingTextures: ENABLE3D.THREE.Texture[] = []
 
   //load map
 
@@ -29,8 +30,11 @@ export class LevelManager3D {
 
     //apply lightmap texture to level objects
 
-    const lightmapTexture = await this.loadLightmap(scene, 'lightmap'),
-          lightmapTexture2 = await this.loadLightmap(scene, 'lightmap2');
+    const lightmapTexture = await this.loadLightingTexture(scene, 'lightmap'),
+          lightmapTexture2 = await this.loadLightingTexture(scene, 'lightmap2'),
+          aoMapTexture = await this.loadLightingTexture(scene, 'aomap');
+
+    this.lightingTextures.push(lightmapTexture, lightmapTexture2, aoMapTexture);
 
     let lightmapAlternateTex = false;
 
@@ -40,7 +44,7 @@ export class LevelManager3D {
             const mesh = (child as ENABLE3D.THREE.Mesh); 
 
             if (mesh.material)  
-                this.setLightmapToMesh(mesh, lightmapAlternateTex ? lightmapTexture2 : lightmapTexture, 2.0); 
+                this.setLightingToMesh(mesh, lightmapAlternateTex ? lightmapTexture2 : lightmapTexture, 2.0, aoMapTexture, 0.8); 
 
             lightmapAlternateTex = !lightmapAlternateTex;
         }
@@ -95,36 +99,47 @@ export class LevelManager3D {
 //---------------------------------------------
 
 
-  public static async loadLightmap (scene3d: ENABLE3D.Scene3D, key: string): Promise<ENABLE3D.THREE.Texture>
+  private static async loadLightingTexture (scene3d: ENABLE3D.Scene3D, key: string): Promise<ENABLE3D.THREE.Texture>
   {
-    const lightmapTexture = await scene3d.third.load.texture(key);
+    const texture = await scene3d.third.load.texture(key);
     
-    lightmapTexture.channel = 1; 
-    lightmapTexture.colorSpace = ENABLE3D.THREE.NoColorSpace; 
-    lightmapTexture.flipY = false;
+    texture.channel = 1; 
+    texture.colorSpace = ENABLE3D.THREE.NoColorSpace; 
+    texture.flipY = false;
 
-    return lightmapTexture;
+    return texture;
   }
 
 
-  //---------------------------------------------
+  //--------------------------------------------- light maps and ambient occlusion maps
 
 
-  public static setLightmapToMesh (mesh: ENABLE3D.THREE.Mesh, lightmapTexture: ENABLE3D.THREE.Texture, lightMapIntensity: number): void
-  {
-    if (mesh.geometry.attributes.uv && !mesh.geometry.attributes.uv1)
-        mesh.geometry.setAttribute('uv1', mesh.geometry.attributes.uv.clone('uv')); 
+    public static setLightingToMesh (
+        mesh: ENABLE3D.THREE.Mesh, 
+        lightMap: ENABLE3D.THREE.Texture, 
+        lightMapIntensity: number,
+        aoMap: ENABLE3D.THREE.Texture, 
+        aoMapIntensity: number
+    ): void 
+    {
+        if (mesh.geometry.attributes.uv) {
+            if (!mesh.geometry.attributes.uv1)
+                mesh.geometry.setAttribute('uv1', mesh.geometry.attributes.uv.clone('uv')); 
+            if (!mesh.geometry.attributes.uv2)
+                mesh.geometry.setAttribute('uv2', mesh.geometry.attributes.uv.clone('uv')); 
+        }
 
-    const material = new ENABLE3D.THREE.MeshStandardMaterial({
-        map: (mesh.material as unknown as ENABLE3D.THREE.MeshStandardMaterial).map,
-        lightMap: lightmapTexture,
-        lightMapIntensity,
-        side: ENABLE3D.THREE.DoubleSide
-    });
+        mesh.material = new ENABLE3D.THREE.MeshStandardMaterial({
+            map: (mesh.material as unknown as ENABLE3D.THREE.MeshStandardMaterial).map,
+            lightMap,
+            lightMapIntensity,
+            aoMap,
+            aoMapIntensity,
+            side: ENABLE3D.THREE.DoubleSide
+        });
 
-    mesh.material = material;
-    mesh.material.needsUpdate = true;    
-  }
+        mesh.material.needsUpdate = true;    
+    }
 
 
 
@@ -149,6 +164,7 @@ export class LevelManager3D {
   public static reset(scene: ENABLE3D.Scene3D): void
   {
     Actor.idIterator = 0;
+    this.lightingTextures.length = 0;
     
     if (this.level && this.level.obj) {
 

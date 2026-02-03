@@ -552,13 +552,12 @@ export class Player3D extends Actor {
 
         this.itemProp = new Actor(this.scene, item, this.position.x, this.position.y, this.position.z, true, false, () => {
 
-            this.itemProp?.traverse((child: ENABLE3D.THREE.Object3D) => {
+            this.itemProp?.traverse(child => {
 
                 if (this.itemProp) {
                     this.scene.third.add.existing(this.itemProp);
-                    if (child instanceof ENABLE3D.ExtendedObject3D)
-                        Inventory3D.setItemForThirdPerson(this.itemProp, child);   
-                }
+                    Inventory3D.setItemForThirdPerson(this.itemProp, child);   
+                } 
 
                 this.idle();
             });

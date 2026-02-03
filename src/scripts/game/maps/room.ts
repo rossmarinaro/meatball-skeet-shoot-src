@@ -99,10 +99,10 @@ export async function Range (scene: ENABLE3D.Scene3D): Promise<Readonly<void>>
                 mesh.material = material;
                 mesh.material.needsUpdate = true;
 
-               // if (System.Process.app.timeOfDay >= 17) { //lights on at night 
+                if (System.Process.app.timeOfDay >= 17) { //lights on at night 
                     mesh.layers.enable(BloomLayers.LEVEL);
                     ShaderManager.setSelectiveBloom(2.0, mesh.name, 'level');
-               // }
+                }
 
             }
         });

@@ -15,6 +15,7 @@
         { "island-heightmap": "assets/maps/island.png" },
         { "lightmap": "assets/maps/lightmap.png" },
         { "lightmap2": "assets/maps/lightmap2.jpg" },
+        { "aomap": "assets/maps/aomap.png" },
         { "nori": "assets/textures/nori.jpg" },
         { "fire-texture-3d": "assets/textures/fire.png" }
     ]
