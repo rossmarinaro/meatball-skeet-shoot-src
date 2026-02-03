@@ -208,7 +208,7 @@ export class PlayerItem extends Actor
         case 'automac1000':
 
             if(this.player.health >= 3 || Number.isNaN(this.player.health))
-                ShaderManager.setSelectiveBloom(2, 'muzzle');
+                ShaderManager.setSelectiveBloom(0.5, 'muzzle');
 
             AudioManager.play('automac1000_shot', 2, false, this.scene, 0);
             AudioManager.play('pistol_shot', 0.5, false, this.scene, 0);

@@ -44,7 +44,7 @@ export class LevelManager3D {
             const mesh = (child as ENABLE3D.THREE.Mesh); 
 
             if (mesh.material)  
-                this.setLightingToMesh(mesh, lightmapAlternateTex ? lightmapTexture2 : lightmapTexture, 2.0, aoMapTexture, 0.8); 
+                this.setLightingToMesh(mesh, lightmapAlternateTex ? lightmapTexture2 : lightmapTexture, 2.0, aoMapTexture, 1.5); 
 
             lightmapAlternateTex = !lightmapAlternateTex;
         }
@@ -56,7 +56,7 @@ export class LevelManager3D {
     {
       case 'range': default: (await import ('../game/maps/room')).Range(scene); break;
     }
- 
+
     return true;
 
   }

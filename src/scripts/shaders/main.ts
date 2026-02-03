@@ -121,21 +121,13 @@ export class ShaderManager {
     //-------------------------------- 3d init post processing
 
 
-    public static setPostProcessingBloom (
-        scene: Scene3D, 
-        params: { 
-            bloomThreshold: number, 
-            bloomStrength: number, 
-            bloomRadius: number 
-        }
-
-    ): void
+    public static setPostProcessingBloom (scene: Scene3D): void
     {
         this.baseMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
-        this.unrealBloomPassWeapons = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), params.bloomStrength, params.bloomRadius, params.bloomThreshold);
-        this.unrealBloomPassWholeScreen = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.3, params.bloomRadius, params.bloomThreshold);
-        this.unrealBloomPassLevel = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 2.0, params.bloomRadius, params.bloomThreshold);
+        this.unrealBloomPassWeapons = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.5, 0);
+        this.unrealBloomPassWholeScreen = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.3, 0.5, 0);
+        this.unrealBloomPassLevel = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 2.0, 0.5, 0);
 
         const renderPass = new RenderPass(scene.third.scene, scene.third.camera),
               outputPass = new OutputPass;

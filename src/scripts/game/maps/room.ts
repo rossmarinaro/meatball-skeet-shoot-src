@@ -1,7 +1,9 @@
 import * as ENABLE3D from '@enable3d/phaser-extension'
+import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { System } from '../../internals/Config'
 import chroma from 'chroma-js'
 import { Actor } from '../Actor'
+
 
 export async function Range (scene: ENABLE3D.Scene3D): Promise<Readonly<void>>
 {
@@ -19,7 +21,29 @@ export async function Range (scene: ENABLE3D.Scene3D): Promise<Readonly<void>>
             { color: 0x525252, intensity: 1.5 }
         );
 
+        //day / night sky
+
         LevelManager3D.makeSkybox(scene, System.Process.app.timeOfDay >= 17 ? 'assets/backgrounds/pixel3.png' : 'assets/backgrounds/pixel2.png');
+
+        //evening sky
+
+        if (System.Process.app.timeOfDay >= 15 && System.Process.app.timeOfDay < 17) 
+        {
+            const sky = new Sky();
+            sky.scale.setScalar(450000);
+            scene.third.scene.add(sky);
+        
+            const uniforms = sky.material.uniforms;
+            uniforms['turbidity'].value = 10;
+            uniforms['rayleigh'].value = 3;
+            uniforms['mieCoefficient'].value = 0.005;
+            uniforms['mieDirectionalG'].value = 0.9;
+        
+            const sun = new ENABLE3D.THREE.Vector3();
+            sun.setFromSphericalCoords(1, Math.PI / 2, 0); 
+            uniforms['sunPosition'].value.copy(sun); 
+            scene.third.renderer.toneMappingExposure = 0.5;
+        }
 
         //ground 
 
@@ -106,6 +130,7 @@ export async function Range (scene: ENABLE3D.Scene3D): Promise<Readonly<void>>
 
             }
         });
+        
         res();
     });
 

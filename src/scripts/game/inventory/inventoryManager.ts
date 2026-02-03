@@ -271,7 +271,7 @@ export class Inventory3D {
                 this.checkObjNames(child, 'arm', 'glove'); 
             break;
             case 'penne_pistol': 
-            case 'automac1000':console.log(target['key'])
+            case 'automac1000':
                 target.scale.set(5, 5, 5);
                 this.checkObjNames(child, 'arm', 'glove', 'muzzle'); 
             break;

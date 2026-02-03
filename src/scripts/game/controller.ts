@@ -186,104 +186,65 @@ export class Controller3D {
         
         this.scene.input.addPointer(1);
 
-        if (ThirdDimension.camType === 2) //"2d" perspective
-        {
+        this.joystickBase1 = this.scene.add.circle(100, 450, 50, 0x000000).setAlpha(0.5);
+        this.joystickThumb1 = this.scene.add.circle(100, 450, 30, 0xcccccc).setAlpha(0.5);
+        this.joystick1 = joystickPlugin && joystickPlugin['add'](this.scene, {
+            forceX: 0,
+            forceY: 0,
+            x: 100,
+            y: 450,
+            radius: 60,
+            base: this.joystickBase1,
+            thumb: this.joystickThumb1
+        });
 
-          this.buttonA = this.scene.add.circle(40, 500, 25, 0x000000).setAlpha(0.5)
-            .setInteractive()
-            .on('pointerdown', () => this.left = true)
-            .on('pointerup', () => this.left = false)
-            .on('pointerout', () => this.left = false);
-         
-          this.buttonB = this.scene.add.circle(110, 550, 25, 0x000000).setAlpha(0.5)
-            .setInteractive()
-            .on('pointerdown', () => this.right = true)
-            .on('pointerup', () => this.right = false)
-            .on('pointerout', () => this.right = false);
+        this.joystickBase2 = this.scene.add.circle(this.scene.scale.width - 50, 450, 50, 0x000000).setAlpha(0.5);
+        this.joystickThumb2 = this.scene.add.circle(this.scene.scale.width - 100, 450, 30, 0xcccccc).setAlpha(0.5);
+        this.joystick2 = joystickPlugin && joystickPlugin['add'](this.scene, {
+            forceX: 0,
+            forceY: 0,
+            x: this.scene.scale.width - 100,
+            y: 450,
+            radius: 60,
+            base: this.joystickBase2,
+            thumb: this.joystickThumb2
+        });
 
-          this.buttonC = this.scene.add.circle(this.scene.scale.width - 100, 550, 20, 0x000000).setAlpha(0.5)
+        this.buttonA = this.scene.add.circle(40, 500, 20, 0x000000).setAlpha(0.5)
+            .setInteractive()
+            .on('pointerdown', () => {
+            if (!this.pauseInputs)
+                this.openMenu();
+            });
+
+        this.buttonB = this.scene.add.circle(100, 550, 20, 0x000000).setAlpha(0.5)
             .setInteractive()
             .on('pointerdown', () => this.shoot = true)
             .on('pointerup', () => this.shoot = false)
             .on('pointerout', () => this.shoot = false);
 
-          this.buttonD = this.scene.add.circle(this.scene.scale.width - 50, 510, 20, 0x000000).setAlpha(0.5)
+        this.buttonC = this.scene.add.circle(this.scene.scale.width - 100, 550, 20, 0x000000).setAlpha(0.5)
             .setInteractive()
-            .on('pointerdown', () => {
-                if (!this.pauseInputs)
-                    this.openMenu();
-            });
+            .on('pointerdown', () => this.zoom = true)
+            .on('pointerup', () => this.zoom = false)
+            .on('pointerout', () => this.zoom = false);
 
-          this.buttonE = this.scene.add.circle(this.scene.scale.width - 50, 590, 20, 0x000000).setAlpha(0.5)
+        this.buttonD = this.scene.add.circle(this.scene.scale.width - 50, 510, 20, 0x000000).setAlpha(0.5)
+            .setInteractive()
+            .on('pointerdown', () => Inventory3D.cycleInventory(this.scene, 1))
+
+        this.buttonE = this.scene.add.circle(this.scene.scale.width - 50, 590, 20, 0x000000).setAlpha(0.5)
             .setInteractive()
             .on('pointerdown', () => this.jump = true)
             .on('pointerup', () => this.jump = false)
             .on('pointerout', () => this.jump = false);
-        } 
-        
-        else //standard 3d
-        {
 
-          this.joystickBase1 = this.scene.add.circle(100, 450, 50, 0x000000).setAlpha(0.5);
-          this.joystickThumb1 = this.scene.add.circle(100, 450, 30, 0xcccccc).setAlpha(0.5);
-          this.joystick1 = joystickPlugin && joystickPlugin['add'](this.scene, {
-              forceX: 0,
-              forceY: 0,
-              x: 100,
-              y: 450,
-              radius: 60,
-              base: this.joystickBase1,
-              thumb: this.joystickThumb1
-          });
-
-          this.joystickBase2 = this.scene.add.circle(this.scene.scale.width - 50, 450, 50, 0x000000).setAlpha(0.5);
-          this.joystickThumb2 = this.scene.add.circle(this.scene.scale.width - 100, 450, 30, 0xcccccc).setAlpha(0.5);
-          this.joystick2 = joystickPlugin && joystickPlugin['add'](this.scene, {
-              forceX: 0,
-              forceY: 0,
-              x: this.scene.scale.width - 100,
-              y: 450,
-              radius: 60,
-              base: this.joystickBase2,
-              thumb: this.joystickThumb2
-          });
-
-          this.buttonA = this.scene.add.circle(40, 500, 20, 0x000000).setAlpha(0.5)
-              .setInteractive()
-              .on('pointerdown', () => {
-                if (!this.pauseInputs)
-                    this.openMenu();
-                });
-
-          this.buttonB = this.scene.add.circle(100, 550, 20, 0x000000).setAlpha(0.5)
-              .setInteractive()
-              .on('pointerdown', () => this.shoot = true)
-              .on('pointerup', () => this.shoot = false)
-              .on('pointerout', () => this.shoot = false);
-
-          this.buttonC = this.scene.add.circle(this.scene.scale.width - 100, 550, 20, 0x000000).setAlpha(0.5)
-              .setInteractive()
-              .on('pointerdown', () => this.zoom = true)
-              .on('pointerup', () => this.zoom = false)
-              .on('pointerout', () => this.zoom = false);
-
-          this.buttonD = this.scene.add.circle(this.scene.scale.width - 50, 510, 20, 0x000000).setAlpha(0.5)
-              .setInteractive()
-              .on('pointerdown', () => Inventory3D.cycleInventory(this.scene, 1))
-
-          this.buttonE = this.scene.add.circle(this.scene.scale.width - 50, 590, 20, 0x000000).setAlpha(0.5)
-              .setInteractive()
-              .on('pointerdown', () => this.jump = true)
-              .on('pointerup', () => this.jump = false)
-              .on('pointerout', () => this.jump = false);
-
-          this.buttonG = this.scene.add.circle(40, 590, 20, 0x000000).setAlpha(0.5)
-              .setInteractive()
-              .on('pointerdown', () => {
-                if (!this.pauseInputs)
-                    this.togglePerspectiveCamera();
-                }); 
-        }
+        this.buttonG = this.scene.add.circle(40, 590, 20, 0x000000).setAlpha(0.5)
+            .setInteractive()
+            .on('pointerdown', () => {
+            if (!this.pauseInputs)
+                this.togglePerspectiveCamera();
+            }); 
 
       }
 
@@ -551,28 +512,11 @@ export class Controller3D {
         if (this.gamePadStatus === 1)
             return;
 
-        if (this.scene.scene.get('Survival').scene.isActive()) 
-        {
-            
-            this.scene.input.keyboard?.on('keydown-LEFT', () => this.left = true)
-                                    .on('keyup-LEFT', () => this.left = false)
-                                    .on('keydown-RIGHT', () => this.right = true)
-                                    .on('keyup-RIGHT', () => this.right = false)
-                                    .on('keydown-UP', () => this.up = true)
-                                    .on('keyup-UP', () => this.up = false)
-                                    .on('keydown-DOWN', () => this.down = true)
-                                    .on('keyup-DOWN', () => this.down = false)
-                                    .on('keydown-SPACE', () => this.action = true)
-                                    .on('keyup-SPACE', () => this.action = false);
-            return;
-        }
-
         this.zoom = this.scene.input.mousePointer?.rightButtonDown();
         this.shoot = this.scene.input.mousePointer?.leftButtonDown();
 
         if (!this.keys)
             return;
-
 
       //crouch
 
@@ -631,26 +575,6 @@ export class Controller3D {
     private dumpVirtualJoyStickState(): void
     {
 
-      //"2d"
-      
-      if (ThirdDimension.camType === 2)
-      {
-
-        if (this.left)
-          this.player.move(-41, 0);
-
-        else if (this.right)
-          this.player.move(41, 0);
-
-        else
-         this.player.idle();
-      }
-
-      //true 3d
-
-      else 
-      {
-
         if (this.joystick1 !== null && this.joystick2 !== null)
         {
 
@@ -676,8 +600,7 @@ export class Controller3D {
        
             this.perspectiveControls.update(this.joystick2.forceX / 10, this.joystick2.forceY / 10);
         }
-      }
-      
+    
     }
 
     //-------------------------------- controller

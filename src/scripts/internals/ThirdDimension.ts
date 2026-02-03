@@ -152,7 +152,7 @@ export class ThirdDimension {
                 base2.clear().strokeRoundedRect(standardAspect ? (68 / 100) * width : (57 / 100) * width, System.Config.mobileAndTabletCheck() && System.Config.isPortrait(alerts) ? (84 / 100) * height : (85 / 100) * height, standardAspect ? (65 / 100) * width : (85 / 100) * width, 50, 10);
         
                 if (System.Config.mobileAndTabletCheck()) 
-                    yPos = System.Config.isPortrait(alerts) ? (85.4 / 100) * height : (87.5 / 100) * height;
+                    yPos = System.Config.isPortrait(alerts) ? (86.2 / 100) * height : (87.5 / 100) * height;
         
                 else 
                     yPos = System.Config.isLandscape(alerts) ? (87 / 100) * height : (87.5 / 100) * height;
@@ -240,7 +240,7 @@ export class ThirdDimension {
      
             //set post processing pipeline
 
-            (await import ('../shaders/main')).ShaderManager.setPostProcessingBloom(scene, { bloomStrength: 0.5, bloomThreshold: 0, bloomRadius: 0.5 });
+            (await import ('../shaders/main')).ShaderManager.setPostProcessingBloom(scene);
 
             //precompile shaders
             
